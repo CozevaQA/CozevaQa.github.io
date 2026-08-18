@@ -16,9 +16,14 @@
             <img src="cozevatica.png" alt="Cozeva Logo">
             <span>QA Dashboard</span>
         </div>
-        <button class="menu-toggle" id="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
+        <div class="mobile-controls">
+            <button class="theme-toggle" aria-label="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
     </nav>
 
     <!-- Desktop Sidebar & Mobile Drawer -->
@@ -42,6 +47,13 @@
                 </a>
             </li>
         </ul>
+
+        <div class="sidebar-footer">
+            <button class="theme-toggle full-btn" aria-label="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+                <span>Toggle Theme</span>
+            </button>
+        </div>
     </aside>
 
     <!-- Main Content Area -->
