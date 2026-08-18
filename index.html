@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozeva Release Team Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Mobile Floating Navbar -->
+    <nav class="mobile-navbar">
+        <div class="mobile-logo">
+            <img src="cozevatica.png" alt="Cozeva Logo">
+            <span>QA Dashboard</span>
+        </div>
+        <button class="menu-toggle" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Desktop Sidebar & Mobile Drawer -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="cozevatica.png" alt="Cozeva Logo" class="logo">
+            <h2>Release Team</h2>
+        </div>
+        
+        <ul class="nav-links">
+            <li>
+                <a href="#" class="active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>QA Health Report</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Dashboard Overview</h1>
+        </header>
+        
+        <section class="content-body">
+            <div class="card">
+                <h3>Welcome to the QA Dashboard</h3>
+                <p>Select an option from the menu to view release metrics and health reports.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
