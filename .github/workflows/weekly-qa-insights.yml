@@ -1,0 +1,31 @@
+name: Refresh report index
+
+# Runs whenever you push a weekly report into reports/.
+# The '!' line stops the workflow reacting to its own commit.
+on:
+  push:
+    paths:
+      - 'reports/**'
+      - '!reports/index.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Refresh report index
+        run: |
+          chmod +x tools/build-report-index.sh
+          ./tools/build-report-index.sh
+          git config user.name  "qa-bot"
+          git config user.email "qa-bot@users.noreply.github.com"
+          git add reports/
+          git diff --quiet --cached || git commit -m "Update report index [skip ci]"
+          git push
