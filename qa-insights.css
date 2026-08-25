@@ -1,0 +1,328 @@
+/* ==========================================================================
+   QA Insights — scoped styles.
+   Self-contained tokens so nothing here depends on (or fights with) style.css.
+   Dark mode hooks into the existing body.dark-theme class from script.js.
+   ========================================================================== */
+
+:root {
+    --qa-surface:        #ffffff;
+    --qa-surface-2:      #f6f8f8;
+    --qa-border:         #e2e8e8;
+    --qa-text:           #16302e;
+    --qa-text-muted:     #63807d;
+    --qa-accent:         #0f766e;
+    --qa-accent-soft:    #d7efec;
+    --qa-accent-text:    #ffffff;
+    --qa-shadow:         0 8px 28px rgba(15, 60, 56, .12);
+    --qa-radius:         10px;
+}
+
+body.dark-theme {
+    --qa-surface:        #1c2523;
+    --qa-surface-2:      #232e2c;
+    --qa-border:         #33413f;
+    --qa-text:           #e6efee;
+    --qa-text-muted:     #9db3b0;
+    --qa-accent:         #2dd4bf;
+    --qa-accent-soft:    #123c38;
+    --qa-accent-text:    #06231f;
+    --qa-shadow:         0 8px 28px rgba(0, 0, 0, .45);
+}
+
+/* ---------- Toolbar ---------- */
+
+.qa-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.qa-week-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qa-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    font: inherit;
+    font-size: .92rem;
+    line-height: 1;
+    color: var(--qa-text);
+    background: var(--qa-surface);
+    border: 1px solid var(--qa-border);
+    border-radius: var(--qa-radius);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.qa-btn:hover:not(:disabled) {
+    background: var(--qa-surface-2);
+    border-color: var(--qa-accent);
+}
+
+.qa-btn:focus-visible {
+    outline: 2px solid var(--qa-accent);
+    outline-offset: 2px;
+}
+
+.qa-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.qa-btn-icon {
+    padding: 9px 11px;
+}
+
+.qa-btn-ghost {
+    background: transparent;
+    border-color: transparent;
+}
+
+.qa-btn-primary {
+    background: var(--qa-accent);
+    border-color: var(--qa-accent);
+    color: var(--qa-accent-text);
+}
+
+.qa-btn-primary:hover:not(:disabled) {
+    background: var(--qa-accent);
+    filter: brightness(1.08);
+    color: var(--qa-accent-text);
+}
+
+.qa-date-btn {
+    font-weight: 600;
+    min-width: 15rem;
+    justify-content: space-between;
+}
+
+.qa-caret {
+    font-size: .8rem;
+    color: var(--qa-text-muted);
+}
+
+.qa-badge {
+    padding: 4px 10px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--qa-accent);
+    background: var(--qa-accent-soft);
+    border-radius: 999px;
+}
+
+/* ---------- Calendar popover ---------- */
+
+.qa-date-wrap {
+    position: relative;
+}
+
+.qa-cal {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 302px;
+    padding: 12px;
+    background: var(--qa-surface);
+    border: 1px solid var(--qa-border);
+    border-radius: var(--qa-radius);
+    box-shadow: var(--qa-shadow);
+}
+
+.qa-cal[hidden] {
+    display: none;
+}
+
+.qa-cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.qa-cal-title {
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--qa-text);
+}
+
+.qa-cal-dow,
+.qa-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.qa-cal-dow span {
+    padding: 6px 0;
+    text-align: center;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--qa-text-muted);
+}
+
+.qa-cal-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: inherit;
+    font-size: .85rem;
+    color: var(--qa-text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.qa-cal-day:disabled {
+    opacity: .3;
+    cursor: not-allowed;
+}
+
+.qa-cal-day.is-available {
+    color: var(--qa-text);
+    font-weight: 600;
+    background: var(--qa-accent-soft);
+}
+
+.qa-cal-day.is-available:hover {
+    border-color: var(--qa-accent);
+}
+
+.qa-cal-day.is-selected {
+    background: var(--qa-accent);
+    color: var(--qa-accent-text);
+    font-weight: 700;
+}
+
+.qa-cal-day:focus-visible {
+    outline: 2px solid var(--qa-accent);
+    outline-offset: 1px;
+}
+
+.qa-cal-blank {
+    aspect-ratio: 1 / 1;
+}
+
+.qa-cal-foot {
+    margin: 10px 2px 0;
+    font-size: .74rem;
+    line-height: 1.4;
+    color: var(--qa-text-muted);
+}
+
+/* ---------- Viewer ---------- */
+
+.qa-viewer {
+    position: relative;
+    min-height: 460px;
+    background: var(--qa-surface);
+    border: 1px solid var(--qa-border);
+    border-radius: var(--qa-radius);
+    overflow: hidden;
+}
+
+#qa-frame {
+    display: block;
+    width: 100%;
+    min-height: 460px;
+    border: 0;
+    background: #fff;
+}
+
+#qa-frame[hidden] {
+    display: none;
+}
+
+.qa-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 460px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--qa-text-muted);
+}
+
+.qa-state[hidden] {
+    display: none;
+}
+
+.qa-state i {
+    font-size: 1.9rem;
+    color: var(--qa-accent);
+}
+
+.qa-state h3 {
+    margin: 0;
+    color: var(--qa-text);
+    font-size: 1.05rem;
+}
+
+.qa-state p {
+    margin: 0;
+    max-width: 34rem;
+}
+
+.qa-state .qa-btn {
+    margin-top: 6px;
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 768px) {
+    .qa-toolbar,
+    .qa-week-nav,
+    .qa-toolbar-actions {
+        width: 100%;
+    }
+
+    .qa-week-nav {
+        justify-content: space-between;
+    }
+
+    .qa-date-wrap {
+        flex: 1;
+    }
+
+    .qa-date-btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .qa-cal {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .qa-toolbar-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .qa-btn {
+        transition: none;
+    }
+}

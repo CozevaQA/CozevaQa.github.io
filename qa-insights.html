@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Insights &middot; Cozeva Release Team</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="qa-insights.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Floating Navbar -->
+    <nav class="mobile-navbar">
+        <div class="mobile-logo">
+            <img src="cozevatica.png" alt="Cozeva Logo">
+            <span>QA Dashboard</span>
+        </div>
+        <div class="mobile-controls">
+            <button class="theme-toggle" aria-label="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Desktop Sidebar & Mobile Drawer -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="cozevatica.png" alt="Cozeva Logo" class="logo">
+            <h2>Release Team</h2>
+        </div>
+
+        <ul class="nav-links">
+            <li>
+                <a href="index.html">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>QA Health Report</span>
+                </a>
+            </li>
+            <li>
+                <a href="qa-insights.html" class="active">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>QA Insights</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button class="theme-toggle full-btn" aria-label="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+                <span>Toggle Theme</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="content-header">
+            <h1>QA Insights</h1>
+        </header>
+
+        <section class="content-body">
+
+            <!-- Toolbar -->
+            <div class="qa-toolbar">
+                <div class="qa-week-nav">
+                    <button type="button" class="qa-btn qa-btn-icon" id="qa-prev"
+                            title="Previous Friday" aria-label="Previous Friday">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <div class="qa-date-wrap">
+                        <button type="button" class="qa-btn qa-date-btn" id="qa-date-btn"
+                                aria-haspopup="dialog" aria-expanded="false">
+                            <i class="far fa-calendar-alt"></i>
+                            <span id="qa-date-label">Loading&hellip;</span>
+                            <i class="fas fa-caret-down qa-caret"></i>
+                        </button>
+
+                        <!-- Calendar popover -->
+                        <div class="qa-cal" id="qa-cal" role="dialog" aria-label="Pick a report week" hidden>
+                            <div class="qa-cal-head">
+                                <button type="button" class="qa-btn qa-btn-icon qa-btn-ghost" id="qa-cal-prev"
+                                        aria-label="Previous month">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="qa-cal-title" id="qa-cal-title" aria-live="polite"></span>
+                                <button type="button" class="qa-btn qa-btn-icon qa-btn-ghost" id="qa-cal-next"
+                                        aria-label="Next month">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="qa-cal-dow" aria-hidden="true">
+                                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+                                <span>Th</span><span>Fr</span><span>Sa</span>
+                            </div>
+                            <div class="qa-cal-grid" id="qa-cal-grid"></div>
+                            <p class="qa-cal-foot">Reports are published every Friday. Only Fridays with a published report can be selected.</p>
+                        </div>
+                    </div>
+
+                    <button type="button" class="qa-btn qa-btn-icon" id="qa-next"
+                            title="Next Friday" aria-label="Next Friday">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="qa-toolbar-actions">
+                    <span class="qa-badge" id="qa-badge" hidden>Latest</span>
+                    <button type="button" class="qa-btn" id="qa-latest">
+                        <i class="fas fa-rotate-right"></i>
+                        <span>Latest report</span>
+                    </button>
+                    <a class="qa-btn" id="qa-open" href="#" target="_blank" rel="noopener">
+                        <i class="fas fa-arrow-up-right-from-square"></i>
+                        <span>Open in new tab</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Viewer -->
+            <div class="qa-viewer" id="qa-viewer">
+                <div class="qa-state" id="qa-loading">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <p>Loading report&hellip;</p>
+                </div>
+
+                <div class="qa-state qa-state-empty" id="qa-empty" hidden>
+                    <i class="far fa-calendar-xmark"></i>
+                    <h3 id="qa-empty-title">No report for this week</h3>
+                    <p id="qa-empty-msg">Pick a different Friday, or jump to the latest published report.</p>
+                    <button type="button" class="qa-btn qa-btn-primary" id="qa-empty-latest">Go to latest report</button>
+                </div>
+
+                <iframe id="qa-frame" title="Weekly QA insights report" hidden></iframe>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script src="qa-insights.js"></script>
+</body>
+</html>
