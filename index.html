@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
     <!-- Mobile Floating Navbar -->
     <nav class="mobile-navbar">
         <div class="mobile-logo">
@@ -28,30 +27,46 @@
 
     <!-- Desktop Sidebar & Mobile Drawer -->
     <aside class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar">
+            <i class="fas fa-angle-left"></i>
+        </button>
+
         <div class="sidebar-header">
             <img src="cozevatica.png" alt="Cozeva Logo" class="logo">
             <h2>Release Team</h2>
         </div>
-        
+
         <ul class="nav-links">
             <li>
-                <a href="index.html" class="active">
+                <a href="index.html" class="active" title="Home">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="#" title="QA Health Report">
                     <i class="fas fa-heartbeat"></i>
                     <span>QA Health Report</span>
                 </a>
             </li>
             <li>
-                <a href="qa-insights.html">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>QA Insights</span>
+                <a href="qa-insights.html" title="AI Insights">
+                    <svg class="nav-ai-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect x="2.5" y="5" width="15" height="15" rx="3.5" stroke="currentColor" stroke-width="2"/>
+                        <text x="10" y="15.9" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="currentColor" text-anchor="middle">AI</text>
+                        <path d="M18.6,0.3 L19.562,3.338 L22.6,4.3 L19.562,5.262 L18.6,8.3 L17.638,5.262 L14.6,4.3 L17.638,3.338 Z" fill="currentColor"/>
+                        <path d="M16.3,4.88 L16.745,6.255 L18.12,6.7 L16.745,7.145 L16.3,8.52 L15.855,7.145 L14.48,6.7 L15.855,6.255 Z" fill="currentColor"/>
+                    </svg>
+                    <span>AI Insights</span>
                 </a>
             </li>
+            <li>
+                <a href="redmine-list.html" title="Redmine List">
+                    <i class="fas fa-list-check"></i>
+                    <span>Redmine List</span>
+                </a>
+            </li>
+
         </ul>
 
         <div class="sidebar-footer">
@@ -67,7 +82,7 @@
         <header class="content-header">
             <h1>Dashboard Overview</h1>
         </header>
-        
+
         <section class="content-body">
             <div class="card">
                 <h3>Welcome to the QA Dashboard</h3>

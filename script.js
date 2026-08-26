@@ -1,11 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const themeToggles = document.querySelectorAll('.theme-toggle'); // Selects both mobile and desktop buttons
 
     // --- Mobile Sidebar Logic ---
     menuToggle.addEventListener('click', () => {
         sidebar.classList.toggle('open');
+    });
+
+    // --- Collapsible Sidebar Logic (Desktop) ---
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
     });
 
     document.addEventListener('click', (event) => {

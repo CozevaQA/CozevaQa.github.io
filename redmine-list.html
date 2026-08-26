@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Insights &middot; Cozeva Release Team</title>
+    <title>Redmine Lists &middot; Cozeva Release Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="qa-insights.css">
+    <link rel="stylesheet" href="redmine-list.css">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS: reads the .xlsx in the browser so it renders as a table -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <!-- Mobile Floating Navbar -->
@@ -51,7 +54,7 @@
                 </a>
             </li>
             <li>
-                <a href="qa-insights.html" class="active" title="AI Insights">
+                <a href="qa-insights.html" title="AI Insights">
                     <svg class="nav-ai-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <rect x="2.5" y="5" width="15" height="15" rx="3.5" stroke="currentColor" stroke-width="2"/>
                         <text x="10" y="15.9" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="currentColor" text-anchor="middle">AI</text>
@@ -62,9 +65,9 @@
                 </a>
             </li>
             <li>
-                <a href="redmine-list.html" title="Redmine List">
+                <a href="redmine-list.html" class="active" title="Redmine Lists">
                     <i class="fas fa-list-check"></i>
-                    <span>Redmine List</span>
+                    <span>Redmine Lists</span>
                 </a>
             </li>
         </ul>
@@ -80,7 +83,7 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <header class="content-header">
-            <h1>AI Insights</h1>
+            <h1>Redmine Lists</h1>
         </header>
 
         <section class="content-body">
@@ -89,7 +92,7 @@
             <div class="qa-toolbar">
                 <div class="qa-week-nav">
                     <button type="button" class="qa-btn qa-btn-icon" id="qa-prev"
-                            title="Previous Friday" aria-label="Previous Friday">
+                            title="Previous list" aria-label="Previous list">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
@@ -102,7 +105,7 @@
                         </button>
 
                         <!-- Calendar popover -->
-                        <div class="qa-cal" id="qa-cal" role="dialog" aria-label="Pick a report week" hidden>
+                        <div class="qa-cal" id="qa-cal" role="dialog" aria-label="Pick a list date" hidden>
                             <div class="qa-cal-head">
                                 <button type="button" class="qa-btn qa-btn-icon qa-btn-ghost" id="qa-cal-prev"
                                         aria-label="Previous month">
@@ -119,12 +122,12 @@
                                 <span>Th</span><span>Fr</span><span>Sa</span>
                             </div>
                             <div class="qa-cal-grid" id="qa-cal-grid"></div>
-                            <p class="qa-cal-foot">Reports are published every Friday. Only Fridays with a published report can be selected.</p>
+                            <p class="qa-cal-foot">Highlighted dates have a test cycle list in the repo.</p>
                         </div>
                     </div>
 
                     <button type="button" class="qa-btn qa-btn-icon" id="qa-next"
-                            title="Next Friday" aria-label="Next Friday">
+                            title="Next list" aria-label="Next list">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -133,12 +136,22 @@
                     <span class="qa-badge" id="qa-badge" hidden>Latest</span>
                     <button type="button" class="qa-btn" id="qa-latest">
                         <i class="fas fa-rotate-right"></i>
-                        <span>Latest report</span>
+                        <span>Latest list</span>
                     </button>
-                    <a class="qa-btn" id="qa-open" href="#" target="_blank" rel="noopener">
-                        <i class="fas fa-arrow-up-right-from-square"></i>
-                        <span>Open in new tab</span>
+                    <a class="qa-btn" id="qa-download" href="#" download>
+                        <i class="fas fa-file-arrow-down"></i>
+                        <span>Download .xlsx</span>
                     </a>
+                </div>
+            </div>
+
+            <!-- Sheet tabs + filter -->
+            <div class="rm-subbar" id="rm-subbar" hidden>
+                <div class="rm-sheets" id="rm-sheets" role="tablist" aria-label="Worksheets"></div>
+                <div class="rm-filter">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="search" id="rm-search" placeholder="Filter rows" aria-label="Filter rows">
+                    <span class="rm-count" id="rm-count"></span>
                 </div>
             </div>
 
@@ -146,23 +159,49 @@
             <div class="qa-viewer" id="qa-viewer">
                 <div class="qa-state" id="qa-loading">
                     <i class="fas fa-circle-notch fa-spin"></i>
-                    <p>Loading report&hellip;</p>
+                    <p>Loading list&hellip;</p>
                 </div>
 
                 <div class="qa-state qa-state-empty" id="qa-empty" hidden>
                     <i class="far fa-calendar-xmark"></i>
-                    <h3 id="qa-empty-title">No report for this week</h3>
-                    <p id="qa-empty-msg">Pick a different Friday, or jump to the latest published report.</p>
-                    <button type="button" class="qa-btn qa-btn-primary" id="qa-empty-latest">Go to latest report</button>
+                    <h3 id="qa-empty-title">No list for this date</h3>
+                    <p id="qa-empty-msg">Pick a highlighted date, or jump to the most recent list.</p>
+                    <button type="button" class="qa-btn qa-btn-primary" id="qa-empty-latest">Go to latest list</button>
                 </div>
 
-                <iframe id="qa-frame" title="Weekly QA insights report" hidden></iframe>
+                <div class="rm-groups" id="rm-groups" hidden>
+                    <section class="rm-group" id="rm-group-done">
+                        <header class="rm-group-head">
+                            <h3>Done in PROD</h3>
+                            <span class="rm-group-count" id="rm-done-count"></span>
+                        </header>
+                        <div class="rm-table-wrap">
+                            <table class="rm-table" id="rm-table-done">
+                                <thead id="rm-thead-done"></thead>
+                                <tbody id="rm-tbody-done"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="rm-group" id="rm-group-progress">
+                        <header class="rm-group-head">
+                            <h3>In Progress</h3>
+                            <span class="rm-group-count" id="rm-progress-count"></span>
+                        </header>
+                        <div class="rm-table-wrap">
+                            <table class="rm-table" id="rm-table-progress">
+                                <thead id="rm-thead-progress"></thead>
+                                <tbody id="rm-tbody-progress"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
             </div>
 
         </section>
     </main>
 
     <script src="script.js"></script>
-    <script src="qa-insights.js"></script>
+    <script src="redmine-list.js"></script>
 </body>
 </html>
