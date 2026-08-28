@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly QA Insights - Release Team - 28th Aug&#x27;26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#141b26; --ink-soft:#3a4657; --muted:#6b7787; --faint:#9aa5b3;
+    --paper:#f6f7f9; --card:#ffffff; --line:#e4e8ee; --line-strong:#cdd4dd;
+    --signal:#2b6ef2; --pass:#16a34a; --alert:#e5484d; --amber:#d9822b;
+    --slate:#5b6b82; --indigo:#5a5bd6; --ink-band:#101826;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 22px}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  h1,h2,h3{font-family:"Space Grotesk",sans-serif; letter-spacing:-.01em; line-height:1.15; margin:0}
+
+  header{background:var(--ink-band); color:#eef2f7; padding:38px 0 30px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#8fb0ef}
+  header h1{font-size:33px; font-weight:600; margin:10px 0 6px; color:#fff}
+  header .sub{color:#a9b6c6; font-size:15px; max-width:70ch}
+  .meta-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:26px; background:#26313f; border:1px solid #26313f; border-radius:8px; overflow:hidden}
+  .meta-grid div{background:#141d29; padding:12px 14px}
+  .meta-grid dt{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#7c8a9c; margin:0}
+  .meta-grid dd{margin:4px 0 0; font-size:14px; color:#e7edf4; font-weight:500}
+
+  section{padding:40px 0 6px}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:12px}
+  .sec-num{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--signal); font-weight:500}
+  .sec-head h2{font-size:23px; font-weight:600}
+  .sec-head p{margin:0 0 0 auto; color:var(--muted); font-size:13px; text-align:right; max-width:52ch}
+
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:22px}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; position:relative; overflow:hidden}
+  .stat .k{font-family:"Space Grotesk",sans-serif; font-size:26px; font-weight:600; letter-spacing:-.02em; line-height:1.05}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:6px}
+  .stat .tick{position:absolute; top:0; right:0; width:34px; height:3px}
+  .t-signal{background:var(--signal)} .t-pass{background:var(--pass)} .t-alert{background:var(--alert)} .t-amber{background:var(--amber)} .t-slate{background:var(--slate)} .t-indigo{background:var(--indigo)}
+
+  .ai-callout{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--indigo); border-radius:10px; padding:20px 24px; margin-top:6px}
+  .ai-callout :is(p,li){color:var(--ink-soft); font-size:14.5px}
+  .ai-callout h3,.ai-callout h4{font-family:"Space Grotesk",sans-serif; color:var(--ink); margin:14px 0 6px}
+
+  .charts{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:6px}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px 16px}
+  .panel h3{font-size:15px; font-weight:600; margin-bottom:2px}
+  .panel .cap{font-size:12.5px; color:var(--muted); margin:0 0 12px}
+  .panel .cvs{position:relative; height:250px}
+  .span2{grid-column:1 / -1}
+
+  footer{margin-top:46px; padding:26px 0 40px; border-top:1px solid var(--line); color:var(--faint); font-size:12px}
+  footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
+
+  @media (max-width:760px){ .meta-grid,.stats,.charts{grid-template-columns:1fr 1fr} .sec-head p{display:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Release Team - Quality Assurance - Weekly Insights</div>
+    <h1>Weekly QA Insights &mdash; 28th Aug&#x27;26</h1>
+    <p class="sub">A consolidated view of Release Team delivery over the last 1 days: validation throughput, week-over-week movement, and AI-generated analysis of the underlying Redmine activity.</p>
+    <dl class="meta-grid">
+      <div><dt>Reporting date</dt><dd class="mono">28th Aug&#x27;26</dd></div>
+      <div><dt>Period</dt><dd>1 days</dd></div>
+      <div><dt>Items progressed</dt><dd class="mono">18</dd></div>
+      <div><dt>Substantive updates</dt><dd class="mono">31</dd></div>
+      <div><dt>Taken in for validation</dt><dd class="mono">7</dd></div>
+      <div><dt>Returned to owners</dt><dd class="mono">16</dd></div>
+      <div><dt>Closed / resolved</dt><dd class="mono" style="color:#7ee0a0">0</dd></div>
+      <div><dt>Past target date</dt><dd class="mono" style="color:#f0a35f">4</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 01 EXECUTIVE SUMMARY -->
+<section>
+  <div class="sec-head"><span class="sec-num">01</span><h2>Executive summary &amp; wins</h2><p>The Release Team drove 18 item(s) forward this period with 31 update(s) and 15 comment(s). 0 item(s) reached a closed/resolved outcome. 4 open item(s) remain past target date. Volume eased by 94 item(s) versus last week.</p></div>
+  <div class="ai-callout" style="border-left-color:var(--pass)">
+    <ul style="margin:0; padding-left:20px"><li>16 item(s) completed Release Team validation and were handed back to their owning teams.</li><li>The team absorbed 7 incoming item(s) for verification, keeping the delivery pipeline moving.</li><li>Past-due volume was reduced by 29 item(s) versus last week - a direct schedule-risk improvement.</li></ul>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="tick t-signal"></span><div class="k">18</div><div class="l">Items progressed - -94 vs last week</div></div>
+    <div class="stat"><span class="tick t-indigo"></span><div class="k">31</div><div class="l">Substantive updates - -97 vs last week</div></div>
+    <div class="stat"><span class="tick t-pass"></span><div class="k">7</div><div class="l">Items taken in for validation</div></div>
+    <div class="stat"><span class="tick t-amber"></span><div class="k">16</div><div class="l">Items returned to owning teams</div></div>
+  </div>
+</section>
+
+<!-- 02 STANDOUTS -->
+<section>
+  <div class="sec-head"><span class="sec-num">02</span><h2>Team standouts</h2><p>Recognising the strongest contributions this period</p></div>
+  <div class="stats"><div class='stat'><span class='tick t-indigo'></span><div class='k' style='font-size:19px'>Mousumi Dey</div><div class='l'>Most items taken in for validation - 2 items</div></div><div class='stat'><span class='tick t-indigo'></span><div class='k' style='font-size:19px'>Krishna Kundu</div><div class='l'>Most items received from the team - 3 items</div></div></div>
+</section>
+
+<!-- 03 AI INSIGHTS -->
+<section>
+  <div class="sec-head"><span class="sec-num">03</span><h2>Analysis &amp; risk signals</h2><p>AI-generated from the underlying Redmine activity</p></div>
+  <div class="ai-callout"><p><strong>AI Insights</strong>
+Over the past 24 hours ending August 28, 2026, the team tracked 18 matching issues, generating 31 total updates and 15 comments across 10 active contributors. Overall activity saw 1 issue reach Closed - Resolved status (along with 2 closed as duplicates), 1 currently in Ph6.Validation/QA, 5 in Ph1.New Request/Hand-off, and 7 sitting in Assigned status.</p>
+<ul>
+<li><strong>Overdue volume &amp; schedule risks:</strong> 4 open issues are currently overdue, posing an immediate schedule risk to ongoing delivery timelines.</li>
+<li><strong>Priority gaps:</strong> 13 issues are marked with an "Unknown" priority status, creating potential triage blind spots for critical work.</li>
+<li><strong>Verification triggers:</strong> The explicit phrase <strong>"Verified on STAGE"</strong> was triggered 0 times and <strong>"Verified on CERT"</strong> was triggered 0 times in comment texts during this lookback period (though broader CERT and STAGE verification testing was noted across RMs #55192, #54061, and #55715).</li>
+<li><strong>Back-and-Forth / Rework Cycles:</strong> Rework loops were triggered on multiple validation items due to defects uncovered during environment testing:</li>
+<li>Redmine #54061 ("For CERT server, please enable the listed measures for registries and analytics") was sent back to development after CERT verification uncovered "undefined" chart displays and missing PDC scores in the registry view.</li>
+<li>Redmine #55715 ("[BZH] Update 'Welcome to Cozeva!' Emails verbiage") was bounced back from STAGE verification due to template issues.</li>
+<li>Redmine #55710 ("New Century Health Plan | Unable to pull up patients in my BATCH") required re-assignment after verification identified patient batch display anomalies.</li>
+<li><strong>Release Team Commendation:</strong> Kudos to Suman Basu for smoothly verifying and closing Redmine #54837 ("[GLOBAL] HEDIS 2026 PCE Measure Update") across multiple production customers with comprehensive functionality and navigation reports. Additionally, Pritam Sur demonstrated quick triage turnaround by resolving and linking duplicate batch processing issues (RM #55983 and #55985) back to RM #55710.</li>
+</ul>
+<p><strong>Notable RM Types</strong>
+The predominant work types this period consisted of Maintenance of Business batch list issues, measure updates/analytics configuration, and EHR integration requests. 
+- <strong>Security-related items:</strong> Redmine #55959, #55963, and #55964 cover critical access permissions under the subject <em>"External EHR Access Requests - Touchworks &amp; Veradigm"</em>. 
+- <strong>Major software upgrades:</strong> While no dedicated package upgrade RM subject was opened this period, Redmine #54355 (<em>"Handle the concatenation of fname and lname for the parent_created_by column on the UI side."</em>) explicitly notes an upcoming core <strong>Drupal update</strong> as a critical release dependency.</p></div>
+</section>
+
+<!-- 04 BREAKDOWN -->
+<section>
+  <div class="sec-head"><span class="sec-num">04</span><h2>Delivery breakdown</h2><p>Where the team's effort landed, by project and work type</p></div>
+  <div class="charts">
+    <div class="panel">
+      <h3>Items by project</h3>
+      <p class="cap">Distribution of Release Team effort across product areas.</p>
+      <div class="cvs"><canvas id="projectChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Items by tracker</h3>
+      <p class="cap">Mix of work types handled this period.</p>
+      <div class="cvs"><canvas id="trackerChart"></canvas></div>
+    </div>
+    <div class="panel span2">
+      <h3>Release Team &mdash; weekly delivery trend</h3>
+      <p class="cap">Sustained throughput across recent reporting periods.</p>
+      <div class="cvs"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Release Team - Weekly QA Insights</span>
+    <span class="mono">Source: Redmine issue history - Generated 28th Aug&#x27;26</span>
+  </div>
+</footer>
+
+<script>
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6b7787';
+const C = {signal:'#2b6ef2', pass:'#16a34a', alert:'#e5484d', amber:'#d9822b', slate:'#5b6b82', indigo:'#5a5bd6', line:'#e4e8ee'};
+const PALETTE = ['#2b6ef2','#e5484d','#16a34a','#d9822b','#5a5bd6','#0ea5e9','#db2777','#65a30d','#5b6b82','#8b5cf6','#f59e0b','#14b8a6'];
+
+new Chart(document.getElementById('projectChart'), {
+  type:'doughnut',
+  data:{ labels:["Customer Data and Product Support", "Coding Tool", "Infrastructure", "EMR Integrations", "Cozeva Quality", "Customer Success"], datasets:[{ data:[9, 3, 3, 1, 1, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
+  options:{ maintainAspectRatio:false, cutout:'58%',
+    plugins:{legend:{position:'right', labels:{boxWidth:10, boxHeight:10, padding:8, font:{size:11}}}} }
+});
+
+new Chart(document.getElementById('trackerChart'), {
+  type:'bar',
+  data:{ labels:["CDAPS-Feature", "Design Bug", "Feature", "CDAPS-Bug", "SysAdmin", "KTLO", "CDAPS-Maintenance of Business"], datasets:[{ data:[1, 1, 1, 2, 3, 4, 6], backgroundColor:C.signal, borderRadius:3 }] },
+  options:{ maintainAspectRatio:false, indexAxis:'y',
+    scales:{ x:{grid:{color:C.line}, ticks:{precision:0}}, y:{grid:{display:false}} },
+    plugins:{legend:{display:false}} }
+});
+
+new Chart(document.getElementById('trendChart'), {
+  type:'bar',
+  data:{ labels:["20th Aug'26", "25th Aug'26", "27th Aug'26", "28th Aug'26"], datasets:[
+    {label:'Updates', data:[70, 99, 128, 31], backgroundColor:C.slate, borderRadius:3},
+    {label:'Items progressed', data:[51, 104, 112, 18], backgroundColor:C.pass, borderRadius:3}
+  ]},
+  options:{ maintainAspectRatio:false,
+    scales:{ x:{grid:{display:false}}, y:{grid:{color:C.line}, ticks:{precision:0}} },
+    plugins:{legend:{position:'bottom', labels:{boxWidth:11, boxHeight:11, padding:12}}} }
+});
+</script>
+</body>
+</html>
