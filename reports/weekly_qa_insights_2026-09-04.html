@@ -83,9 +83,9 @@
       <div><dt>Reporting date</dt><dd class="mono">4th Sep&#x27;26</dd></div>
       <div><dt>Period</dt><dd>7 days</dd></div>
       <div><dt>Items progressed</dt><dd class="mono">85</dd></div>
-      <div><dt>Substantive updates</dt><dd class="mono">102</dd></div>
+      <div><dt>Substantive updates</dt><dd class="mono">101</dd></div>
       <div><dt>Taken in for validation</dt><dd class="mono">33</dd></div>
-      <div><dt>Returned to owners</dt><dd class="mono">49</dd></div>
+      <div><dt>Returned to owners</dt><dd class="mono">48</dd></div>
       <div><dt>Closed / resolved</dt><dd class="mono" style="color:#7ee0a0">0</dd></div>
       <div><dt>Past target date</dt><dd class="mono" style="color:#f0a35f">54</dd></div>
     </dl>
@@ -104,16 +104,16 @@
 
 <!-- 01 EXECUTIVE SUMMARY -->
 <section>
-  <div class="sec-head"><span class="sec-num">01</span><h2>Executive summary &amp; wins</h2><p>The Release Team drove 85 item(s) forward this period with 102 update(s) and 76 comment(s). 0 item(s) reached a closed/resolved outcome. 54 open item(s) remain past target date. Delivery volume held steady against last week.</p></div>
+  <div class="sec-head"><span class="sec-num">01</span><h2>Executive summary &amp; wins</h2><p>The Release Team drove 85 item(s) forward this period with 101 update(s) and 75 comment(s). 0 item(s) reached a closed/resolved outcome. 54 open item(s) remain past target date. Delivery volume held steady against last week.</p></div>
   <div class="ai-callout" style="border-left-color:var(--pass)">
-    <ul style="margin:0; padding-left:20px"><li>49 item(s) completed Release Team validation and were handed back to their owning teams.</li><li>The team absorbed 33 incoming item(s) for verification, keeping the delivery pipeline moving.</li></ul>
+    <ul style="margin:0; padding-left:20px"><li>48 item(s) completed Release Team validation and were handed back to their owning teams.</li><li>The team absorbed 33 incoming item(s) for verification, keeping the delivery pipeline moving.</li></ul>
   </div>
 
   <div class="stats">
     <div class="stat"><span class="tick t-signal"></span><div class="k">85</div><div class="l">Items progressed - 0 vs last week</div></div>
-    <div class="stat"><span class="tick t-indigo"></span><div class="k">102</div><div class="l">Substantive updates - 0 vs last week</div></div>
+    <div class="stat"><span class="tick t-indigo"></span><div class="k">101</div><div class="l">Substantive updates - -1 vs last week</div></div>
     <div class="stat"><span class="tick t-pass"></span><div class="k">33</div><div class="l">Items taken in for validation</div></div>
-    <div class="stat"><span class="tick t-amber"></span><div class="k">49</div><div class="l">Items returned to owning teams</div></div>
+    <div class="stat"><span class="tick t-amber"></span><div class="k">48</div><div class="l">Items returned to owning teams</div></div>
   </div>
 </section>
 
@@ -181,7 +181,7 @@ const CHARTS = [];
 
 CHARTS.push(new Chart(document.getElementById('projectChart'), {
   type:'doughnut',
-  data:{ labels:["Cozeva Quality", "Customer Data and Product Support", "Cozeva App", "Provider Connect Solution", "Coding Tool", "Cozeva Data Platform", "EMR Integrations", "Architecture & Scalability", "Cozeva Base", "Infrastructure", "Service Model 1", "Risk Adjustment"], datasets:[{ data:[25, 19, 16, 5, 5, 3, 3, 2, 2, 2, 2, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
+  data:{ labels:["Cozeva Quality", "Customer Data and Product Support", "Cozeva App", "Coding Tool", "Provider Connect Solution", "Cozeva Data Platform", "EMR Integrations", "Architecture & Scalability", "Cozeva Base", "Infrastructure", "Service Model 1", "Risk Adjustment"], datasets:[{ data:[25, 19, 16, 5, 5, 3, 3, 2, 2, 2, 2, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
   options:{ maintainAspectRatio:false, cutout:'58%',
     plugins:{legend:{position:'right', labels:{boxWidth:10, boxHeight:10, padding:8, font:{size:11}}}} }
 }));
@@ -196,9 +196,9 @@ CHARTS.push(new Chart(document.getElementById('trackerChart'), {
 
 CHARTS.push(new Chart(document.getElementById('trendChart'), {
   type:'bar',
-  data:{ labels:["20th Aug'26", "25th Aug'26", "27th Aug'26", "28th Aug'26", "4th Sep'26", "4th Sep'26", "4th Sep'26", "4th Sep'26"], datasets:[
-    {label:'Updates', data:[70, 99, 128, 31, 102, 102, 102, 102], backgroundColor:C.slate, borderRadius:3},
-    {label:'Items progressed', data:[51, 104, 112, 18, 85, 85, 85, 85], backgroundColor:C.pass, borderRadius:3}
+  data:{ labels:["25th Aug'26", "27th Aug'26", "28th Aug'26", "4th Sep'26", "4th Sep'26", "4th Sep'26", "4th Sep'26", "4th Sep'26"], datasets:[
+    {label:'Updates', data:[99, 128, 31, 102, 102, 102, 102, 101], backgroundColor:C.slate, borderRadius:3},
+    {label:'Items progressed', data:[104, 112, 18, 85, 85, 85, 85, 85], backgroundColor:C.pass, borderRadius:3}
   ]},
   options:{ maintainAspectRatio:false,
     scales:{ x:{grid:{display:false}}, y:{grid:{color:C.line}, ticks:{precision:0}} },
