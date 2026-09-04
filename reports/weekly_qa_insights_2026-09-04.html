@@ -82,12 +82,12 @@
     <dl class="meta-grid">
       <div><dt>Reporting date</dt><dd class="mono">4th Sep&#x27;26</dd></div>
       <div><dt>Period</dt><dd>7 days</dd></div>
-      <div><dt>Items progressed</dt><dd class="mono">85</dd></div>
-      <div><dt>Substantive updates</dt><dd class="mono">101</dd></div>
+      <div><dt>Items progressed</dt><dd class="mono">83</dd></div>
+      <div><dt>Substantive updates</dt><dd class="mono">98</dd></div>
       <div><dt>Taken in for validation</dt><dd class="mono">33</dd></div>
-      <div><dt>Returned to owners</dt><dd class="mono">48</dd></div>
+      <div><dt>Returned to owners</dt><dd class="mono">45</dd></div>
       <div><dt>Closed / resolved</dt><dd class="mono" style="color:#7ee0a0">0</dd></div>
-      <div><dt>Past target date</dt><dd class="mono" style="color:#f0a35f">54</dd></div>
+      <div><dt>Past target date</dt><dd class="mono" style="color:#f0a35f">52</dd></div>
     </dl>
   </div>
 </header>
@@ -104,23 +104,23 @@
 
 <!-- 01 EXECUTIVE SUMMARY -->
 <section>
-  <div class="sec-head"><span class="sec-num">01</span><h2>Executive summary &amp; wins</h2><p>The Release Team drove 85 item(s) forward this period with 101 update(s) and 75 comment(s). 0 item(s) reached a closed/resolved outcome. 54 open item(s) remain past target date. Delivery volume held steady against last week.</p></div>
+  <div class="sec-head"><span class="sec-num">01</span><h2>Executive summary &amp; wins</h2><p>The Release Team drove 83 item(s) forward this period with 98 update(s) and 72 comment(s). 0 item(s) reached a closed/resolved outcome. 52 open item(s) remain past target date. Volume eased by 2 item(s) versus last week.</p></div>
   <div class="ai-callout" style="border-left-color:var(--pass)">
-    <ul style="margin:0; padding-left:20px"><li>48 item(s) completed Release Team validation and were handed back to their owning teams.</li><li>The team absorbed 33 incoming item(s) for verification, keeping the delivery pipeline moving.</li></ul>
+    <ul style="margin:0; padding-left:20px"><li>45 item(s) completed Release Team validation and were handed back to their owning teams.</li><li>The team absorbed 33 incoming item(s) for verification, keeping the delivery pipeline moving.</li><li>Past-due volume was reduced by 2 item(s) versus last week - a direct schedule-risk improvement.</li></ul>
   </div>
 
   <div class="stats">
-    <div class="stat"><span class="tick t-signal"></span><div class="k">85</div><div class="l">Items progressed - 0 vs last week</div></div>
-    <div class="stat"><span class="tick t-indigo"></span><div class="k">101</div><div class="l">Substantive updates - -1 vs last week</div></div>
+    <div class="stat"><span class="tick t-signal"></span><div class="k">83</div><div class="l">Items progressed - -2 vs last week</div></div>
+    <div class="stat"><span class="tick t-indigo"></span><div class="k">98</div><div class="l">Substantive updates - -4 vs last week</div></div>
     <div class="stat"><span class="tick t-pass"></span><div class="k">33</div><div class="l">Items taken in for validation</div></div>
-    <div class="stat"><span class="tick t-amber"></span><div class="k">48</div><div class="l">Items returned to owning teams</div></div>
+    <div class="stat"><span class="tick t-amber"></span><div class="k">45</div><div class="l">Items returned to owning teams</div></div>
   </div>
 </section>
 
 <!-- 02 STANDOUTS -->
 <section>
   <div class="sec-head"><span class="sec-num">02</span><h2>Team standouts</h2><p>Recognising the strongest contributions this period</p></div>
-  <div class="stats"><div class='stat'><span class='tick t-indigo'></span><div class='k' style='font-size:19px'>Atreyee Halder</div><div class='l'>Most items taken in for validation - 3 items</div></div></div>
+  <div class="stats"><div class='stat'><span class='tick t-indigo'></span><div class='k' style='font-size:19px'>Moumita Das</div><div class='l'>Most items taken in for validation - 4 items</div></div></div>
 </section>
 
 </div>
@@ -156,7 +156,20 @@
 <!-- 04 AI INSIGHTS -->
 <section>
   <div class="sec-head"><span class="sec-num">04</span><h2>Analysis &amp; risk signals</h2><p>AI-generated from the underlying Redmine activity</p></div>
-  <div class="ai-callout"><p style='color:#9aa5b3'>AI insights unavailable for this run.</p></div>
+  <div class="ai-callout"><p><strong>AI Insights</strong>
+Over the past week ending September 4, 2026, the team tracked 83 matching issues, generating 98 total updates and 72 comments across 18 active contributors. A total of 19 issues reached closed status (18 in Closed - Resolved and 1 in Ph10.Closed-Resolved) during this period, with 5 issues currently sitting in the Ph6.Validation/QA phase and 45 actively assigned.</p>
+<ul>
+<li><strong>High overdue volume:</strong> 52 open issues are currently overdue, presenting a substantial schedule risk to overall project milestones.</li>
+<li><strong>Priority gaps:</strong> 46 issues have an "Unknown" priority classification, making accurate triage and strategic resource allocation difficult.</li>
+<li><strong>Verification triggers:</strong> Automated comment parsing recorded the explicit phrases "Verified on STAGE" 2 times and "Verified on CERT" 2 times, within a broader trend of extensive staging, certification, and production testing updates logged across the issue tracking history.</li>
+<li><strong>High back-and-forth / Rework:</strong> Multiple issues exhibited rework loops following QA verification failures on pre-production environments. Specifically, Redmine #53172 required re-handling after QA identified three separate edge-case bugs on CERT (missing group columns and stale gap counts), Redmine #50646 was sent back to development due to an "Error Occurred" exception during CERT search verification, Redmine #54813 triggered split-off rework for masquerade export defects, Redmine #54919 failed compliance calculation on CERT after adding supplemental data, and Redmine #55221 was returned due to missing patient names in generated PDF headers.</li>
+<li><strong>Release Team Commendation:</strong> Exceptional effort by the release and QA teams this week in executing a massive update wave—successfully verifying and resolving 10 global HEDIS 2026 measure updates (including ASF-E, APM-E, COL-E, CIS-E, SPC-E, DSU, CHL, FMA-E, DBM-E, and LBP) directly on Production with zero deployment rollbacks and complete audit documentation attached.</li>
+</ul>
+<p><strong>Notable RM Types</strong>
+The primary RM types observed in subject lines this period were HEDIS/ACO Measure Updates (e.g., "[GLOBAL] HEDIS 2026 ASF-E Measure Update") and UI/Display &amp; Data-Export Defects (e.g., blank patient lists, missing header fields, and context dropdown glitches), along with several Embedded App/EHR integration items.</p>
+<p>Two notable security and infrastructure updates occurred this period:
+- <strong>Security Item:</strong> Redmine #55110 covers <code>"Application Security Remediation for Veracode Static Code Scan"</code>, which addresses critical and medium-risk CWE-78 (OS Command Injection) and CWE-95 (PHP/JS Eval Injection) security vulnerabilities across system controllers.
+- <strong>Infrastructure Upgrade:</strong> Redmine #51966 covers <code>"Migrate cert from legacy to uppers/certuat"</code>, a core environment infrastructure migration.</p></div>
 </section>
 
 </div>
@@ -181,14 +194,14 @@ const CHARTS = [];
 
 CHARTS.push(new Chart(document.getElementById('projectChart'), {
   type:'doughnut',
-  data:{ labels:["Cozeva Quality", "Customer Data and Product Support", "Cozeva App", "Coding Tool", "Provider Connect Solution", "Cozeva Data Platform", "EMR Integrations", "Architecture & Scalability", "Cozeva Base", "Infrastructure", "Service Model 1", "Risk Adjustment"], datasets:[{ data:[25, 19, 16, 5, 5, 3, 3, 2, 2, 2, 2, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
+  data:{ labels:["Cozeva Quality", "Customer Data and Product Support", "Cozeva App", "Coding Tool", "Provider Connect Solution", "Cozeva Data Platform", "Infrastructure", "EMR Integrations", "Architecture & Scalability", "Cozeva Base", "Service Model 1", "Risk Adjustment"], datasets:[{ data:[24, 18, 14, 5, 5, 4, 3, 3, 2, 2, 2, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
   options:{ maintainAspectRatio:false, cutout:'58%',
     plugins:{legend:{position:'right', labels:{boxWidth:10, boxHeight:10, padding:8, font:{size:11}}}} }
 }));
 
 CHARTS.push(new Chart(document.getElementById('trackerChart'), {
   type:'bar',
-  data:{ labels:["Spike", "Corp IT Support", "SysAdmin", "CDAPS-Bug", "CDAPS-Feature", "User story", "Feature", "CDAPS-Maintenance of Business", "Bug", "KTLO"], datasets:[{ data:[1, 1, 1, 3, 3, 6, 7, 13, 15, 35], backgroundColor:C.signal, borderRadius:3 }] },
+  data:{ labels:["Spike", "SysAdmin", "Corp IT Support", "CDAPS-Bug", "CDAPS-Feature", "User story", "Feature", "CDAPS-Maintenance of Business", "Bug", "KTLO"], datasets:[{ data:[1, 1, 2, 3, 3, 5, 7, 12, 14, 35], backgroundColor:C.signal, borderRadius:3 }] },
   options:{ maintainAspectRatio:false, indexAxis:'y',
     scales:{ x:{grid:{color:C.line}, ticks:{precision:0}}, y:{grid:{display:false}} },
     plugins:{legend:{display:false}} }
@@ -196,9 +209,9 @@ CHARTS.push(new Chart(document.getElementById('trackerChart'), {
 
 CHARTS.push(new Chart(document.getElementById('trendChart'), {
   type:'bar',
-  data:{ labels:["25th Aug'26", "27th Aug'26", "28th Aug'26", "4th Sep'26", "4th Sep'26", "4th Sep'26", "4th Sep'26", "4th Sep'26"], datasets:[
-    {label:'Updates', data:[99, 128, 31, 102, 102, 102, 102, 101], backgroundColor:C.slate, borderRadius:3},
-    {label:'Items progressed', data:[104, 112, 18, 85, 85, 85, 85, 85], backgroundColor:C.pass, borderRadius:3}
+  data:{ labels:["20th Aug'26", "25th Aug'26", "27th Aug'26", "28th Aug'26", "4th Sep'26", "4th Sep'26"], datasets:[
+    {label:'Updates', data:[70, 99, 128, 31, 98, 102], backgroundColor:C.slate, borderRadius:3},
+    {label:'Items progressed', data:[51, 104, 112, 18, 83, 85], backgroundColor:C.pass, borderRadius:3}
   ]},
   options:{ maintainAspectRatio:false,
     scales:{ x:{grid:{display:false}}, y:{grid:{color:C.line}, ticks:{precision:0}} },
