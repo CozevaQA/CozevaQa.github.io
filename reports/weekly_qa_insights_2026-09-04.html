@@ -181,7 +181,7 @@ const CHARTS = [];
 
 CHARTS.push(new Chart(document.getElementById('projectChart'), {
   type:'doughnut',
-  data:{ labels:["Cozeva Quality", "Customer Data and Product Support", "Cozeva App", "Coding Tool", "Provider Connect Solution", "Cozeva Data Platform", "EMR Integrations", "Architecture & Scalability", "Cozeva Base", "Infrastructure", "Service Model 1", "Risk Adjustment"], datasets:[{ data:[25, 19, 16, 5, 5, 3, 3, 2, 2, 2, 2, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
+  data:{ labels:["Cozeva Quality", "Customer Data and Product Support", "Cozeva App", "Provider Connect Solution", "Coding Tool", "Cozeva Data Platform", "EMR Integrations", "Architecture & Scalability", "Cozeva Base", "Infrastructure", "Service Model 1", "Risk Adjustment"], datasets:[{ data:[25, 19, 16, 5, 5, 3, 3, 2, 2, 2, 2, 1], backgroundColor:PALETTE, borderColor:'#fff', borderWidth:2 }] },
   options:{ maintainAspectRatio:false, cutout:'58%',
     plugins:{legend:{position:'right', labels:{boxWidth:10, boxHeight:10, padding:8, font:{size:11}}}} }
 }));
@@ -196,9 +196,9 @@ CHARTS.push(new Chart(document.getElementById('trackerChart'), {
 
 CHARTS.push(new Chart(document.getElementById('trendChart'), {
   type:'bar',
-  data:{ labels:["20th Aug'26", "25th Aug'26", "27th Aug'26", "28th Aug'26", "4th Sep'26", "4th Sep'26", "4th Sep'26"], datasets:[
-    {label:'Updates', data:[70, 99, 128, 31, 102, 102, 102], backgroundColor:C.slate, borderRadius:3},
-    {label:'Items progressed', data:[51, 104, 112, 18, 85, 85, 85], backgroundColor:C.pass, borderRadius:3}
+  data:{ labels:["20th Aug'26", "25th Aug'26", "27th Aug'26", "28th Aug'26", "4th Sep'26", "4th Sep'26", "4th Sep'26", "4th Sep'26"], datasets:[
+    {label:'Updates', data:[70, 99, 128, 31, 102, 102, 102, 102], backgroundColor:C.slate, borderRadius:3},
+    {label:'Items progressed', data:[51, 104, 112, 18, 85, 85, 85, 85], backgroundColor:C.pass, borderRadius:3}
   ]},
   options:{ maintainAspectRatio:false,
     scales:{ x:{grid:{display:false}}, y:{grid:{color:C.line}, ticks:{precision:0}} },
