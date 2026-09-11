@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Insights &middot; Cozeva Release Team</title>
+    <title>Performance Test &middot; Cozeva Release Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="qa-insights.css">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body data-report-dir="reports/ai-insights/"
-      data-report-prefix="weekly_qa_insights_"
-      data-report-cadence="weekly"
-      data-report-date-prefix="Week ending ">
+<body data-report-dir="reports/performance-test/">
     <!-- Mobile Floating Navbar -->
     <nav class="mobile-navbar">
         <div class="mobile-logo">
@@ -54,7 +51,7 @@
                 </a>
             </li>
             <li>
-                <a href="qa-insights.html" class="active" title="AI Insights">
+                <a href="qa-insights.html" title="AI Insights">
                     <svg class="nav-ai-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <rect x="2.5" y="5" width="15" height="15" rx="3.5" stroke="currentColor" stroke-width="2"/>
                         <text x="10" y="15.9" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="currentColor" text-anchor="middle">AI</text>
@@ -65,7 +62,7 @@
                 </a>
             </li>
             <li>
-                <a href="performance-test.html" title="Performance Test">
+                <a href="performance-test.html" class="active" title="Performance Test">
                     <i class="fas fa-gauge-high"></i>
                     <span>Performance Test</span>
                 </a>
@@ -89,7 +86,7 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <header class="content-header">
-            <h1>AI Insights</h1>
+            <h1>Performance Test</h1>
         </header>
 
         <section class="content-body">
@@ -98,7 +95,7 @@
             <div class="qa-toolbar">
                 <div class="qa-week-nav">
                     <button type="button" class="qa-btn qa-btn-icon" id="qa-prev"
-                            title="Previous Friday" aria-label="Previous Friday">
+                            title="Previous report" aria-label="Previous report">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
@@ -111,7 +108,7 @@
                         </button>
 
                         <!-- Calendar popover -->
-                        <div class="qa-cal" id="qa-cal" role="dialog" aria-label="Pick a report week" hidden>
+                        <div class="qa-cal" id="qa-cal" role="dialog" aria-label="Pick a report date" hidden>
                             <div class="qa-cal-head">
                                 <button type="button" class="qa-btn qa-btn-icon qa-btn-ghost" id="qa-cal-prev"
                                         aria-label="Previous month">
@@ -128,12 +125,12 @@
                                 <span>Th</span><span>Fr</span><span>Sa</span>
                             </div>
                             <div class="qa-cal-grid" id="qa-cal-grid"></div>
-                            <p class="qa-cal-foot">Reports are published every Friday. Only Fridays with a published report can be selected.</p>
+                            <p class="qa-cal-foot">Only dates with a published performance test report can be selected.</p>
                         </div>
                     </div>
 
                     <button type="button" class="qa-btn qa-btn-icon" id="qa-next"
-                            title="Next Friday" aria-label="Next Friday">
+                            title="Next report" aria-label="Next report">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -161,11 +158,11 @@
                 <div class="qa-state qa-state-empty" id="qa-empty" hidden>
                     <i class="far fa-calendar-xmark"></i>
                     <h3 id="qa-empty-title">No report for this week</h3>
-                    <p id="qa-empty-msg">Pick a different Friday, or jump to the latest published report.</p>
+                    <p id="qa-empty-msg">Pick a different date, or jump to the latest published report.</p>
                     <button type="button" class="qa-btn qa-btn-primary" id="qa-empty-latest">Go to latest report</button>
                 </div>
 
-                <iframe id="qa-frame" title="Weekly QA insights report" hidden></iframe>
+                <iframe id="qa-frame" title="Performance test report" hidden></iframe>
             </div>
 
         </section>

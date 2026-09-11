@@ -48,7 +48,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" title="QA Health Report">
+                <a href="qa-health-report.html" title="QA Health Report">
                     <i class="fas fa-heartbeat"></i>
                     <span>QA Health Report</span>
                 </a>
@@ -62,6 +62,12 @@
                         <path d="M16.3,4.88 L16.745,6.255 L18.12,6.7 L16.745,7.145 L16.3,8.52 L15.855,7.145 L14.48,6.7 L15.855,6.255 Z" fill="currentColor"/>
                     </svg>
                     <span>AI Insights</span>
+                </a>
+            </li>
+            <li>
+                <a href="performance-test.html" title="Performance Test">
+                    <i class="fas fa-gauge-high"></i>
+                    <span>Performance Test</span>
                 </a>
             </li>
             <li>
@@ -87,6 +93,11 @@
         </header>
 
         <section class="content-body">
+
+            <p class="rm-subtitle">
+                Every ticket the release team put through a test cycle, with the status and the
+                environments each one reached. Pick a date to see that cycle&rsquo;s list.
+            </p>
 
             <!-- Toolbar -->
             <div class="qa-toolbar">
@@ -145,18 +156,76 @@
                 </div>
             </div>
 
-            <!-- Sheet tabs + filter -->
-            <div class="rm-subbar" id="rm-subbar" hidden>
-                <div class="rm-sheets" id="rm-sheets" role="tablist" aria-label="Worksheets"></div>
+            <!-- At-a-glance counts for the selected list -->
+            <div class="rm-stats" id="rm-stats" hidden>
+                <article class="rm-stat">
+                    <span class="rm-stat-icon"><i class="fas fa-layer-group"></i></span>
+                    <div class="rm-stat-body">
+                        <span class="rm-stat-label">Tickets in this cycle</span>
+                        <strong class="rm-stat-value" id="rm-stat-total">&mdash;</strong>
+                    </div>
+                </article>
+                <article class="rm-stat" data-tone="done" id="rm-stat-card-done">
+                    <span class="rm-stat-icon"><i class="fas fa-circle-check"></i></span>
+                    <div class="rm-stat-body">
+                        <span class="rm-stat-label">Done in PROD</span>
+                        <strong class="rm-stat-value" id="rm-stat-done">&mdash;</strong>
+                    </div>
+                </article>
+                <article class="rm-stat" data-tone="progress" id="rm-stat-card-progress">
+                    <span class="rm-stat-icon"><i class="fas fa-circle-half-stroke"></i></span>
+                    <div class="rm-stat-body">
+                        <span class="rm-stat-label">Still in progress</span>
+                        <strong class="rm-stat-value" id="rm-stat-progress">&mdash;</strong>
+                    </div>
+                </article>
+                <article class="rm-stat">
+                    <span class="rm-stat-icon"><i class="fas fa-user-group"></i></span>
+                    <div class="rm-stat-body">
+                        <span class="rm-stat-label">QA engineers involved</span>
+                        <strong class="rm-stat-value" id="rm-stat-people">&mdash;</strong>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Source chips + status segments + search -->
+            <div class="rm-controls" id="rm-controls" hidden>
+                <div class="rm-controls-left">
+                    <div class="rm-sheets" id="rm-sheets" aria-label="Sources and worksheets"></div>
+                    <!-- A filter group, not tabs: there is no tabpanel to own, so these
+                         are toggle buttons reporting state via aria-pressed. -->
+                    <div class="rm-seg" id="rm-seg" role="group" aria-label="Filter by status" hidden>
+                        <button type="button" class="rm-seg-btn" id="rm-seg-all"
+                                data-status="all" aria-pressed="true">
+                            <span>All</span>
+                            <span class="rm-seg-num" id="rm-seg-all-n"></span>
+                        </button>
+                        <button type="button" class="rm-seg-btn" id="rm-seg-done"
+                                data-status="done" aria-pressed="false">
+                            <span class="rm-seg-dot" aria-hidden="true"></span>
+                            <span>Done in PROD</span>
+                            <span class="rm-seg-num" id="rm-seg-done-n"></span>
+                        </button>
+                        <button type="button" class="rm-seg-btn" id="rm-seg-progress"
+                                data-status="progress" aria-pressed="false">
+                            <span class="rm-seg-dot" aria-hidden="true"></span>
+                            <span>In progress</span>
+                            <span class="rm-seg-num" id="rm-seg-progress-n"></span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="rm-filter">
-                    <i class="fas fa-magnifying-glass"></i>
-                    <input type="search" id="rm-search" placeholder="Filter rows" aria-label="Filter rows">
-                    <span class="rm-count" id="rm-count"></span>
+                    <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="rm-search"
+                           placeholder="Search id, title, tracker, engineer&hellip;"
+                           aria-label="Search this list">
+                    <span class="rm-count" id="rm-count" aria-live="polite"></span>
                 </div>
             </div>
 
             <!-- Viewer -->
-            <div class="qa-viewer" id="qa-viewer">
+            <div class="qa-viewer rm-viewer" id="qa-viewer">
                 <div class="qa-state" id="qa-loading">
                     <i class="fas fa-circle-notch fa-spin"></i>
                     <p>Loading list&hellip;</p>
@@ -169,32 +238,20 @@
                     <button type="button" class="qa-btn qa-btn-primary" id="qa-empty-latest">Go to latest list</button>
                 </div>
 
-                <div class="rm-groups" id="rm-groups" hidden>
-                    <section class="rm-group" id="rm-group-done">
-                        <header class="rm-group-head">
-                            <h3>Done in PROD</h3>
-                            <span class="rm-group-count" id="rm-done-count"></span>
-                        </header>
-                        <div class="rm-table-wrap">
-                            <table class="rm-table" id="rm-table-done">
-                                <thead id="rm-thead-done"></thead>
-                                <tbody id="rm-tbody-done"></tbody>
-                            </table>
-                        </div>
-                    </section>
+                <div class="rm-card" id="rm-card" hidden>
+                    <div class="rm-table-wrap">
+                        <table class="rm-table" id="rm-table">
+                            <thead id="rm-thead"></thead>
+                            <tbody id="rm-tbody"></tbody>
+                        </table>
+                    </div>
 
-                    <section class="rm-group" id="rm-group-progress">
-                        <header class="rm-group-head">
-                            <h3>In Progress</h3>
-                            <span class="rm-group-count" id="rm-progress-count"></span>
-                        </header>
-                        <div class="rm-table-wrap">
-                            <table class="rm-table" id="rm-table-progress">
-                                <thead id="rm-thead-progress"></thead>
-                                <tbody id="rm-tbody-progress"></tbody>
-                            </table>
-                        </div>
-                    </section>
+                    <div class="rm-nohits" id="rm-nohits" hidden>
+                        <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                        <p>Nothing matches that search in this view.</p>
+                    </div>
+
+                    <p class="rm-foot" id="rm-foot" hidden></p>
                 </div>
             </div>
 

@@ -5,6 +5,11 @@
    Unlike QA Insights, dates here are arbitrary (not locked to Fridays) and the
    files are .xlsx, so this page is manifest-driven: it reads the index written
    by tools/build-redmine-index.sh rather than guessing file names.
+
+   The sheet is not dumped verbatim. Columns are matched to known roles by their
+   header text and each role gets a purpose-built cell (status pill, environment
+   pipeline, assignee chip, test window). Anything unrecognised still renders as
+   plain text, so a change to the sheet shape degrades rather than breaks.
    ========================================================================== */
 
 (function () {
@@ -24,6 +29,7 @@
     const toISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const encodePath = p => p.split('/').map(encodeURIComponent).join('/');
+    const text = v => String(v == null ? '' : v).trim();
 
     function fromISO(s) {
         const [y, m, d] = s.split('-').map(Number);
@@ -34,6 +40,32 @@
         weekday: 'long', day: 'numeric', month: 'short', year: 'numeric'
     });
     const monthFmt = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
+    const dayFmt = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
+
+    // Sheet dates arrive as strings (raw:false). Show a short day/month when we
+    // can parse one, otherwise hand back whatever the cell said.
+    function shortDate(value) {
+        const s = text(value);
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return dayFmt.format(new Date(+m[1], +m[2] - 1, +m[3]));
+        const t = Date.parse(s);
+        return Number.isNaN(t) ? s : dayFmt.format(new Date(t));
+    }
+
+    function dateKey(value) {
+        const s = text(value);
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+        const t = Date.parse(s);
+        return Number.isNaN(t) ? null : t;
+    }
+
+    function initials(name) {
+        const parts = text(name).split(/\s+/).filter(Boolean);
+        if (!parts.length) return '?';
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
 
     /* ---------------- state -------------------------------------------------- */
 
@@ -55,19 +87,27 @@
         emptyTitle:  document.getElementById('qa-empty-title'),
         emptyMsg:    document.getElementById('qa-empty-msg'),
         emptyLatest: document.getElementById('qa-empty-latest'),
-        subbar:      document.getElementById('rm-subbar'),
+        stats:       document.getElementById('rm-stats'),
+        statTotal:   document.getElementById('rm-stat-total'),
+        statDone:    document.getElementById('rm-stat-done'),
+        statProgress: document.getElementById('rm-stat-progress'),
+        statPeople:  document.getElementById('rm-stat-people'),
+        cardDone:    document.getElementById('rm-stat-card-done'),
+        cardProgress: document.getElementById('rm-stat-card-progress'),
+        controls:    document.getElementById('rm-controls'),
         sheets:      document.getElementById('rm-sheets'),
+        seg:         document.getElementById('rm-seg'),
+        segBtns:     Array.prototype.slice.call(document.querySelectorAll('.rm-seg-btn')),
+        segAllN:     document.getElementById('rm-seg-all-n'),
+        segDoneN:    document.getElementById('rm-seg-done-n'),
+        segProgressN: document.getElementById('rm-seg-progress-n'),
         search:      document.getElementById('rm-search'),
         count:       document.getElementById('rm-count'),
-        tableWrap:       document.getElementById('rm-groups'),
-        doneSection:     document.getElementById('rm-group-done'),
-        doneCount:       document.getElementById('rm-done-count'),
-        theadDone:       document.getElementById('rm-thead-done'),
-        tbodyDone:       document.getElementById('rm-tbody-done'),
-        progressSection: document.getElementById('rm-group-progress'),
-        progressCount:   document.getElementById('rm-progress-count'),
-        theadProgress:   document.getElementById('rm-thead-progress'),
-        tbodyProgress:   document.getElementById('rm-tbody-progress')
+        card:        document.getElementById('rm-card'),
+        thead:       document.getElementById('rm-thead'),
+        tbody:       document.getElementById('rm-tbody'),
+        noHits:      document.getElementById('rm-nohits'),
+        foot:        document.getElementById('rm-foot')
     };
 
     let byDate = new Map();      // Map<isoDate, entry[]>
@@ -78,6 +118,13 @@
     let workbook = null;
     let activeSheet = null;
     let calMonth = startOfDay(new Date());
+
+    // The rendered sheet: rows are enriched objects, not bare arrays.
+    let view = null;             // { columns, items, hasStatus, truncated }
+    let statusFilter = 'all';
+    let sortCol = -1;            // index into view.columns
+    let sortDir = 1;
+    let searchTimer = 0;
 
     /* ---------------- manifest ----------------------------------------------- */
 
@@ -119,8 +166,9 @@
     function showState(which) {
         el.loading.hidden   = which !== 'loading';
         el.empty.hidden     = which !== 'empty';
-        el.tableWrap.hidden = which !== 'table';
-        el.subbar.hidden    = which !== 'table';
+        el.card.hidden      = which !== 'table';
+        el.controls.hidden  = which !== 'table';
+        el.stats.hidden     = which !== 'table';
     }
 
     function updateToolbar(iso) {
@@ -131,7 +179,7 @@
         el.latest.disabled = iso === latestDate;
     }
 
-    /* ---------------- spreadsheet rendering ----------------------------------- */
+    /* ---------------- source / worksheet chips -------------------------------- */
 
     function renderSheetTabs() {
         el.sheets.innerHTML = '';
@@ -149,9 +197,11 @@
                 btn.addEventListener('click', () => openEntry(entry));
                 el.sheets.appendChild(btn);
             });
-            const sep = document.createElement('span');
-            sep.className = 'rm-sep';
-            el.sheets.appendChild(sep);
+            if (names.length > 1) {
+                const sep = document.createElement('span');
+                sep.className = 'rm-sep';
+                el.sheets.appendChild(sep);
+            }
         }
 
         if (names.length < 2) return;   // single sheet: no tabs worth showing
@@ -159,12 +209,12 @@
         names.forEach(name => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.role = 'tab';
             btn.className = 'rm-chip' + (name === activeSheet ? ' is-active' : '');
-            btn.setAttribute('aria-selected', String(name === activeSheet));
+            btn.setAttribute('aria-pressed', String(name === activeSheet));
             btn.textContent = name;
             btn.addEventListener('click', () => {
                 activeSheet = name;
+                buildView();
                 renderSheetTabs();
                 renderTable();
             });
@@ -172,16 +222,30 @@
         });
     }
 
+    /* ---------------- sheet shaping ------------------------------------------- */
+
     // Environment progression: later stages supersede earlier ones.
+    const ENV_STEPS = ['STAGE', 'CERT', 'PROD'];
     const ENV_ORDER = { STAGE: 1, CERT: 2, PROD: 3 };
 
     function envRank(value) {
-        const cell = String(value == null ? '' : value).toUpperCase();
+        const cell = text(value).toUpperCase();
         let rank = -1;
-        Object.keys(ENV_ORDER).forEach(name => {
+        ENV_STEPS.forEach(name => {
             if (cell.indexOf(name) !== -1) rank = Math.max(rank, ENV_ORDER[name]);
         });
         return rank;
+    }
+
+    // Which of the three pipeline stages this cell actually names, plus any
+    // other environment it mentions (DEV and friends) so nothing is dropped.
+    function envParts(value) {
+        const cell = text(value).toUpperCase();
+        const on = ENV_STEPS.filter(step => cell.indexOf(step) !== -1);
+        const extra = cell.split(/[,/;|]+/)
+            .map(t => t.trim())
+            .filter(t => t && ENV_STEPS.indexOf(t) === -1);
+        return { on, extra };
     }
 
     // Collapses rows that share a Redmine Id, keeping only the row for the
@@ -196,7 +260,7 @@
         const indexByKey = new Map();
 
         rows.forEach(row => {
-            const key = String(row[idIdx] == null ? '' : row[idIdx]).trim();
+            const key = text(row[idIdx]);
             if (!key) { order.push(row); return; }
 
             if (!indexByKey.has(key)) {
@@ -214,119 +278,444 @@
         return order;
     }
 
-    // Sorts rows by Redmine Id ascending (numeric). Rows with a non-numeric
-    // or missing id are left in place at the end, in their original order.
-    function sortByRedmineId(header, rows) {
-        const idIdx = header.findIndex(h => /redmine/i.test(String(h)));
-        if (idIdx === -1) return rows;
-
-        const numbered = [];
-        const rest = [];
-        rows.forEach(row => {
-            const n = parseInt(row[idIdx], 10);
-            if (Number.isNaN(n)) rest.push(row);
-            else numbered.push({ n, row });
-        });
-
-        numbered.sort((a, b) => a.n - b.n);
-        return numbered.map(x => x.row).concat(rest);
+    // Matches sheet columns to the roles this page knows how to draw.
+    function detectRoles(header) {
+        const find = re => header.findIndex(h => re.test(String(h)));
+        return {
+            id:      find(/redmine/i),
+            tracker: find(/tracker/i),
+            title:   find(/title|subject|summary/i),
+            type:    find(/^\s*type\s*$/i),
+            env:     find(/environment/i),
+            qa:      find(/assign|engineer/i),
+            start:   find(/start/i),
+            end:     find(/end/i)
+        };
     }
 
-    // Splits rows into "Done in PROD" (highest environment reached is PROD)
-    // and "In Progress" (everything else). Returns null when the sheet has
-    // no Environment column to group by.
-    function groupByEnvStatus(header, rows) {
-        const envIdx = header.findIndex(h => /environment/i.test(String(h)));
-        if (envIdx === -1) return null;
-
-        const done = [];
-        const inProgress = [];
-        rows.forEach(row => {
-            (envRank(row[envIdx]) === ENV_ORDER.PROD ? done : inProgress).push(row);
-        });
-        return { done, inProgress };
+    function trackerTone(value) {
+        return /bug/i.test(text(value)) ? 'bug' : 'neutral';
     }
 
-    function renderGroupTable(theadEl, tbodyEl, header, rows) {
-        theadEl.innerHTML = '';
-        tbodyEl.innerHTML = '';
-        if (!header.length) return;
+    /* ---------------- cell painters ------------------------------------------- */
 
-        const htr = document.createElement('tr');
-        header.forEach(cell => {
-            const th = document.createElement('th');
-            th.textContent = String(cell);
-            htr.appendChild(th);
-        });
-        theadEl.appendChild(htr);
-
-        const frag = document.createDocumentFragment();
-        rows.forEach(row => {
-            const tr = document.createElement('tr');
-            for (let i = 0; i < header.length; i++) {
-                const td = document.createElement('td');
-                td.textContent = row[i] == null ? '' : String(row[i]);
-                tr.appendChild(td);
-            }
-            tr.dataset.text = row.join(' ').toLowerCase();
-            frag.appendChild(tr);
-        });
-        tbodyEl.appendChild(frag);
+    function paintMuted(td, label) {
+        const span = document.createElement('span');
+        span.className = 'rm-muted';
+        span.textContent = label;
+        td.appendChild(span);
     }
 
-    function renderTable() {
+    function paintBadge(td, label, tone, icon) {
+        const span = document.createElement('span');
+        span.className = 'rm-badge';
+        span.dataset.tone = tone;
+        if (icon) {
+            const i = document.createElement('i');
+            i.className = icon;
+            i.setAttribute('aria-hidden', 'true');
+            span.appendChild(i);
+        }
+        span.appendChild(document.createTextNode(label));
+        td.appendChild(span);
+    }
+
+    function paintStatus(td, item) {
+        if (item.done) paintBadge(td, 'Done in PROD', 'done', 'fas fa-circle-check');
+        else paintBadge(td, 'In progress', 'progress', 'fas fa-circle-half-stroke');
+    }
+
+    function paintPipeline(td, raw) {
+        const value = text(raw);
+        if (!value) { paintMuted(td, 'Not recorded'); return; }
+
+        const parts = envParts(value);
+        const wrap = document.createElement('span');
+        wrap.className = 'rm-pipe';
+        wrap.title = value;
+
+        ENV_STEPS.forEach(step => {
+            const chip = document.createElement('span');
+            chip.className = 'rm-pipe-step' + (parts.on.indexOf(step) !== -1 ? ' is-on' : '');
+            chip.textContent = step;
+            wrap.appendChild(chip);
+        });
+
+        if (parts.extra.length) {
+            const extra = document.createElement('span');
+            extra.className = 'rm-pipe-extra';
+            extra.textContent = '+' + parts.extra.join(', ');
+            wrap.appendChild(extra);
+        }
+
+        // Spelled out for screen readers, which would otherwise hear bare labels.
+        const sr = parts.on.length ? parts.on.join(', ') : 'no pipeline stage recorded';
+        wrap.setAttribute('aria-label', 'Tested in ' + sr);
+        td.appendChild(wrap);
+    }
+
+    function paintWho(td, raw) {
+        const name = text(raw);
+        if (!name) { paintMuted(td, 'Unassigned'); return; }
+
+        const wrap = document.createElement('span');
+        wrap.className = 'rm-who';
+
+        const avatar = document.createElement('span');
+        avatar.className = 'rm-avatar';
+        avatar.setAttribute('aria-hidden', 'true');
+        avatar.textContent = initials(name);
+
+        wrap.appendChild(avatar);
+        wrap.appendChild(document.createTextNode(name));
+        td.appendChild(wrap);
+    }
+
+    function paintWindow(td, startRaw, endRaw) {
+        const start = text(startRaw);
+        const end = text(endRaw);
+        if (!start && !end) { paintMuted(td, '—'); return; }
+
+        const wrap = document.createElement('span');
+        wrap.className = 'rm-window';
+
+        if (start) wrap.appendChild(document.createTextNode(shortDate(start)));
+        else paintMuted(wrap, '—');
+
+        const arrow = document.createElement('i');
+        arrow.className = 'fas fa-arrow-right';
+        arrow.setAttribute('aria-hidden', 'true');
+        wrap.appendChild(arrow);
+
+        if (end) {
+            wrap.appendChild(document.createTextNode(shortDate(end)));
+        } else {
+            const open = document.createElement('span');
+            open.className = 'rm-muted';
+            open.textContent = 'open';
+            wrap.appendChild(open);
+        }
+
+        td.appendChild(wrap);
+    }
+
+    /* ---------------- column model -------------------------------------------- */
+
+    // Each column knows its label, how to draw a cell, and what to sort on.
+    // `key` is a plain comparable (number, string or null) — null sorts last in
+    // both directions, which is friendlier than flipping blanks to the top.
+    function buildColumns(header, roles, hasStatus) {
+        const columns = [];
+        const used = new Set();
+        const take = idx => { if (idx !== -1) used.add(idx); };
+
+        if (hasStatus) {
+            columns.push({
+                label: 'Status',
+                cls: 'rm-c-status',
+                key: item => (item.done ? 1 : 0),
+                paint: (td, item) => paintStatus(td, item)
+            });
+        }
+
+        if (roles.id !== -1) {
+            take(roles.id);
+            columns.push({
+                label: header[roles.id],
+                cls: 'rm-c-id',
+                key: item => {
+                    const n = parseInt(item.cells[roles.id], 10);
+                    return Number.isNaN(n) ? null : n;
+                },
+                paint: (td, item) => {
+                    const value = text(item.cells[roles.id]);
+                    if (!value) { paintMuted(td, '—'); return; }
+                    const span = document.createElement('span');
+                    span.className = 'rm-id';
+                    span.textContent = '#' + value;
+                    td.appendChild(span);
+                }
+            });
+        }
+
+        if (roles.tracker !== -1) {
+            take(roles.tracker);
+            columns.push({
+                label: header[roles.tracker],
+                cls: 'rm-c-tracker',
+                key: item => text(item.cells[roles.tracker]).toLowerCase() || null,
+                paint: (td, item) => {
+                    const value = text(item.cells[roles.tracker]);
+                    if (!value) { paintMuted(td, '—'); return; }
+                    paintBadge(td, value, trackerTone(value), null);
+                }
+            });
+        }
+
+        if (roles.title !== -1) {
+            take(roles.title);
+            columns.push({
+                label: header[roles.title],
+                cls: 'rm-c-title',
+                key: item => text(item.cells[roles.title]).toLowerCase() || null,
+                paint: (td, item) => {
+                    const value = text(item.cells[roles.title]);
+                    if (!value) { paintMuted(td, '—'); return; }
+                    td.textContent = value;
+                    td.title = value;
+                }
+            });
+        }
+
+        if (roles.type !== -1) {
+            take(roles.type);
+            columns.push({
+                label: header[roles.type],
+                cls: 'rm-c-type',
+                key: item => text(item.cells[roles.type]).toLowerCase() || null,
+                paint: (td, item) => {
+                    const value = text(item.cells[roles.type]);
+                    if (!value) { paintMuted(td, '—'); return; }
+                    const span = document.createElement('span');
+                    span.className = 'rm-soft';
+                    span.textContent = value;
+                    td.appendChild(span);
+                }
+            });
+        }
+
+        if (roles.env !== -1) {
+            take(roles.env);
+            columns.push({
+                label: header[roles.env],
+                cls: 'rm-c-env',
+                key: item => {
+                    const rank = envRank(item.cells[roles.env]);
+                    return rank === -1 ? null : rank;
+                },
+                paint: (td, item) => paintPipeline(td, item.cells[roles.env])
+            });
+        }
+
+        if (roles.qa !== -1) {
+            take(roles.qa);
+            columns.push({
+                label: header[roles.qa],
+                cls: 'rm-c-qa',
+                key: item => text(item.cells[roles.qa]).toLowerCase() || null,
+                paint: (td, item) => paintWho(td, item.cells[roles.qa])
+            });
+        }
+
+        // Start and end read as one span when both are present.
+        if (roles.start !== -1 && roles.end !== -1) {
+            take(roles.start);
+            take(roles.end);
+            columns.push({
+                label: 'Test window',
+                cls: 'rm-c-window',
+                key: item => dateKey(item.cells[roles.start]),
+                paint: (td, item) => paintWindow(td, item.cells[roles.start], item.cells[roles.end])
+            });
+        }
+
+        // Anything the page has no opinion about still gets a plain column.
+        header.forEach((label, idx) => {
+            if (used.has(idx)) return;
+            columns.push({
+                label: label,
+                cls: 'rm-c-other',
+                key: item => text(item.cells[idx]).toLowerCase() || null,
+                paint: (td, item) => {
+                    const value = text(item.cells[idx]);
+                    if (!value) { paintMuted(td, '—'); return; }
+                    td.textContent = value;
+                }
+            });
+        });
+
+        return columns;
+    }
+
+    function buildView() {
         const sheet = workbook.Sheets[activeSheet];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
 
         if (!rows.length) {
-            renderGroupTable(el.theadDone, el.tbodyDone, [], []);
-            renderGroupTable(el.theadProgress, el.tbodyProgress, [], []);
-            el.count.textContent = 'Empty sheet';
+            view = { columns: [], items: [], hasStatus: false, truncated: false };
             return;
         }
 
-        const header = rows[0];
-        const deduped = sortByRedmineId(header, dedupeByRedmineId(header, rows.slice(1)));
+        const header = rows[0].map(h => text(h));
+        const roles = detectRoles(header);
+        const deduped = dedupeByRedmineId(header, rows.slice(1));
         const body = deduped.slice(0, CONFIG.maxRows);
-        const groups = groupByEnvStatus(header, body) || { done: [], inProgress: body };
+        const hasStatus = roles.env !== -1;
 
-        renderGroupTable(el.theadDone, el.tbodyDone, header, groups.done);
-        renderGroupTable(el.theadProgress, el.tbodyProgress, header, groups.inProgress);
-        el.doneCount.textContent = String(groups.done.length);
-        el.progressCount.textContent = String(groups.inProgress.length);
+        const items = body.map(cells => ({
+            cells: cells,
+            done: hasStatus && envRank(cells[roles.env]) === ENV_ORDER.PROD,
+            haystack: cells.join('  ').toLowerCase()
+        }));
 
+        view = {
+            columns: buildColumns(header, roles, hasStatus),
+            items: items,
+            roles: roles,
+            hasStatus: hasStatus,
+            truncated: deduped.length > CONFIG.maxRows
+        };
+
+        // Default sort mirrors the old grouped view: Redmine Id ascending.
+        const idCol = view.columns.findIndex(c => c.cls === 'rm-c-id');
+        sortCol = idCol;
+        sortDir = 1;
+        statusFilter = 'all';
         el.search.value = '';
-        applyFilter();
-
-        if (deduped.length > CONFIG.maxRows) {
-            el.count.textContent = 'Showing first ' + CONFIG.maxRows + ' rows — download for the full sheet';
-        }
     }
 
-    function applyFilter() {
-        const term = el.search.value.trim().toLowerCase();
-        let shown = 0;
-        let total = 0;
+    /* ---------------- stats + controls ---------------------------------------- */
 
-        function filterSection(section, tbody) {
-            const trs = tbody.querySelectorAll('tr');
-            let visible = 0;
-            trs.forEach(tr => {
-                total++;
-                const hit = !term || tr.dataset.text.indexOf(term) !== -1;
-                tr.hidden = !hit;
-                if (hit) { shown++; visible++; }
+    function renderStats() {
+        const items = view.items;
+        const done = items.filter(i => i.done).length;
+        const qaIdx = view.roles ? view.roles.qa : -1;
+
+        const people = new Set();
+        if (qaIdx !== -1) {
+            items.forEach(i => {
+                const name = text(i.cells[qaIdx]);
+                if (name) people.add(name.toLowerCase());
             });
-            section.hidden = trs.length === 0 || (!!term && visible === 0);
         }
 
-        filterSection(el.doneSection, el.tbodyDone);
-        filterSection(el.progressSection, el.tbodyProgress);
+        el.statTotal.textContent = String(items.length);
+        el.statDone.textContent = String(done);
+        el.statProgress.textContent = String(items.length - done);
+        el.statPeople.textContent = qaIdx === -1 ? '—' : String(people.size);
 
-        el.count.textContent = term
-            ? shown + ' of ' + total + ' rows'
-            : total + (total === 1 ? ' row' : ' rows');
+        // Only claim a status split when the sheet actually records environments.
+        el.cardDone.hidden = !view.hasStatus;
+        el.cardProgress.hidden = !view.hasStatus;
+
+        el.seg.hidden = !view.hasStatus;
+        el.segAllN.textContent = String(items.length);
+        el.segDoneN.textContent = String(done);
+        el.segProgressN.textContent = String(items.length - done);
+
+        el.segBtns.forEach(btn => {
+            btn.setAttribute('aria-pressed', String(btn.dataset.status === statusFilter));
+        });
     }
+
+    /* ---------------- table rendering ----------------------------------------- */
+
+    function renderHead() {
+        el.thead.innerHTML = '';
+        if (!view.columns.length) return;
+
+        const tr = document.createElement('tr');
+        view.columns.forEach((col, idx) => {
+            const th = document.createElement('th');
+            th.className = col.cls;
+            th.scope = 'col';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'rm-sort';
+            btn.appendChild(document.createTextNode(col.label || '—'));
+
+            const icon = document.createElement('i');
+            if (idx === sortCol) {
+                th.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+                icon.className = sortDir === 1 ? 'fas fa-sort-up' : 'fas fa-sort-down';
+            } else {
+                icon.className = 'fas fa-sort';
+            }
+            icon.setAttribute('aria-hidden', 'true');
+            btn.appendChild(icon);
+
+            btn.addEventListener('click', () => {
+                if (idx === sortCol) sortDir = -sortDir;
+                else { sortCol = idx; sortDir = 1; }
+                renderTable();
+            });
+
+            th.appendChild(btn);
+            tr.appendChild(th);
+        });
+        el.thead.appendChild(tr);
+    }
+
+    function sortItems(items) {
+        const col = view.columns[sortCol];
+        if (!col) return items;
+
+        return items.slice().sort((a, b) => {
+            const ka = col.key(a);
+            const kb = col.key(b);
+            const ea = ka === null || ka === '';
+            const eb = kb === null || kb === '';
+            if (ea && eb) return 0;
+            if (ea) return 1;      // blanks last, whichever way the column points
+            if (eb) return -1;
+
+            let cmp;
+            if (typeof ka === 'number' && typeof kb === 'number') cmp = ka - kb;
+            else cmp = String(ka).localeCompare(String(kb));
+            return cmp * sortDir;
+        });
+    }
+
+    function renderTable() {
+        renderHead();
+        el.tbody.innerHTML = '';
+
+        if (!view.columns.length) {
+            el.count.textContent = 'Empty sheet';
+            el.noHits.hidden = false;
+            el.foot.hidden = true;
+            return;
+        }
+
+        const term = el.search.value.trim().toLowerCase();
+        const inStatus = view.items.filter(item => {
+            if (statusFilter === 'done') return item.done;
+            if (statusFilter === 'progress') return !item.done;
+            return true;
+        });
+        const matched = term
+            ? inStatus.filter(item => item.haystack.indexOf(term) !== -1)
+            : inStatus;
+
+        const frag = document.createDocumentFragment();
+        sortItems(matched).forEach(item => {
+            const tr = document.createElement('tr');
+            view.columns.forEach(col => {
+                const td = document.createElement('td');
+                td.className = col.cls;
+                col.paint(td, item);
+                tr.appendChild(td);
+            });
+            frag.appendChild(tr);
+        });
+        el.tbody.appendChild(frag);
+
+        el.noHits.hidden = matched.length > 0;
+
+        const noun = n => n + (n === 1 ? ' ticket' : ' tickets');
+        el.count.textContent = term || statusFilter !== 'all'
+            ? noun(matched.length) + ' of ' + view.items.length
+            : noun(matched.length);
+
+        el.foot.hidden = !view.truncated;
+        if (view.truncated) {
+            el.foot.textContent = 'Showing the first ' + CONFIG.maxRows +
+                ' rows — download the spreadsheet for the full sheet.';
+        }
+    }
+
+    /* ---------------- loading -------------------------------------------------- */
 
     async function openEntry(entry) {
         currentEntry = entry;
@@ -344,7 +733,9 @@
             workbook = XLSX.read(buf, { type: 'array' });
             activeSheet = workbook.SheetNames[0];
 
+            buildView();
             renderSheetTabs();
+            renderStats();
             renderTable();
             showState('table');
         } catch (err) {
@@ -476,7 +867,23 @@
 
     el.latest.addEventListener('click', () => latestDate && showDate(latestDate));
     el.emptyLatest.addEventListener('click', () => latestDate && showDate(latestDate));
-    el.search.addEventListener('input', applyFilter);
+
+    el.segBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            statusFilter = btn.dataset.status;
+            el.segBtns.forEach(b => {
+                b.setAttribute('aria-pressed', String(b === btn));
+            });
+            renderTable();
+        });
+    });
+
+    // Debounced: the whole tbody is rebuilt per keystroke, and a wide sheet
+    // makes that measurable.
+    el.search.addEventListener('input', () => {
+        window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(renderTable, 120);
+    });
 
     /* ---------------- boot ------------------------------------------------------ */
 
