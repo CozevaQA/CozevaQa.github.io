@@ -1,7 +1,7 @@
 {
-  "generated": "2026-09-11T05:39:07Z",
+  "generated": "2026-09-11T05:59:25Z",
   "categories": [
-    { "id": "ai-insights", "index": "ai-insights/index.json", "count": 5, "latest": "2026-09-04" },
+    { "id": "ai-insights", "index": "ai-insights/index.json", "count": 6, "latest": "2026-09-11" },
     { "id": "health-report", "index": "health-report/index.json", "count": 1, "latest": "2026-09-04" },
     { "id": "performance-test", "index": "performance-test/index.json", "count": 1, "latest": "2026-09-04" }
   ]
