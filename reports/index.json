@@ -1,10 +1,8 @@
 {
-  "generated": "2026-09-10T09:52:58Z",
-  "reports": [
-    { "date": "2026-09-04", "file": "weekly_qa_insights_2026-09-04.html" },
-    { "date": "2026-08-28", "file": "weekly_qa_insights_2026-08-28.html" },
-    { "date": "2026-08-27", "file": "weekly_qa_insights_2026-08-27.html" },
-    { "date": "2026-08-25", "file": "weekly_qa_insights_2026-08-25.html" },
-    { "date": "2026-08-21", "file": "weekly_qa_insights_2026-08-21.html" }
+  "generated": "2026-09-10T13:27:04Z",
+  "categories": [
+    { "id": "ai-insights", "index": "ai-insights/index.json", "count": 5, "latest": "2026-09-04" },
+    { "id": "health-report", "index": "health-report/index.json", "count": 1, "latest": "2026-09-04" },
+    { "id": "performance-test", "index": "performance-test/index.json", "count": 1, "latest": "2026-09-04" }
   ]
 }

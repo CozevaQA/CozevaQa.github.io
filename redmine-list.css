@@ -1,28 +1,145 @@
 /* ==========================================================================
    Redmine Lists — table viewer.
    Inherits every colour token from qa-insights.css, so load that file first.
+
+   Badge palette: ink/tint pairs are checked, not eyeballed. Every ink clears
+   4.5:1 on its own tint, and the three colour-carrying roles (done, progress,
+   bug) sit >= 15 OKLab dE apart in both modes. Every badge also carries a text
+   label, so colour is never the only channel.
    ========================================================================== */
 
-/* ---------- sub-toolbar: sheet tabs + row filter ---------- */
+:root {
+    --rm-done-ink:      #14691a;
+    --rm-done-tint:     #e4f4e6;
+    --rm-prog-ink:      #8f6b00;
+    --rm-prog-tint:     #fdf6e6;
+    --rm-bug-ink:       #a32020;
+    --rm-bug-tint:      #fbe9e9;
+    --rm-neutral-ink:   #526b69;
+    --rm-neutral-tint:  #eef2f2;
+}
 
-.rm-subbar {
+body.dark-theme {
+    --rm-done-ink:      #6ede84;
+    --rm-done-tint:     #16321c;
+    --rm-prog-ink:      #f2c65a;
+    --rm-prog-tint:     #332a12;
+    --rm-bug-ink:       #f78f8f;
+    --rm-bug-tint:      #3a1e1e;
+    --rm-neutral-ink:   #9db3b0;
+    --rm-neutral-tint:  #2a3634;
+}
+
+/* ---------- page intro ---------- */
+
+.rm-subtitle {
+    margin: -1.4rem 0 1.6rem;
+    max-width: 46rem;
+    font-size: .93rem;
+    line-height: 1.5;
+    color: var(--qa-text-muted);
+}
+
+/* ---------- stat tiles ---------- */
+
+.rm-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 12px;
+    margin: 0 0 16px;
+}
+
+.rm-stats[hidden] {
+    display: none;
+}
+
+.rm-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--qa-surface);
+    border: 1px solid var(--qa-border);
+    border-radius: var(--qa-radius);
+}
+
+.rm-stat-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    font-size: .95rem;
+    border-radius: 9px;
+    color: var(--rm-neutral-ink);
+    background: var(--rm-neutral-tint);
+}
+
+.rm-stat[data-tone="done"] .rm-stat-icon {
+    color: var(--rm-done-ink);
+    background: var(--rm-done-tint);
+}
+
+.rm-stat[data-tone="progress"] .rm-stat-icon {
+    color: var(--rm-prog-ink);
+    background: var(--rm-prog-tint);
+}
+
+.rm-stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rm-stat-label {
+    font-size: .78rem;
+    line-height: 1.2;
+    color: var(--qa-text-muted);
+}
+
+/* Proportional figures on purpose: tabular-nums gives every digit the width of
+   a zero, which reads loose at display sizes. Tabular is for the columns. */
+.rm-stat-value {
+    font-size: 1.45rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--qa-text);
+}
+
+/* ---------- controls: source chips, status segments, search ---------- */
+
+.rm-controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
-.rm-subbar[hidden] {
+.rm-controls[hidden] {
     display: none;
 }
+
+.rm-controls-left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Source / worksheet chips — only rendered when a date has more than one. */
 
 .rm-sheets {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+}
+
+.rm-sheets:empty {
+    display: none;
 }
 
 .rm-chip {
@@ -58,9 +175,80 @@
 .rm-sep {
     width: 1px;
     height: 20px;
-    margin: 0 4px;
+    margin: 0 2px;
     background: var(--qa-border);
 }
+
+/* Status segmented control */
+
+.rm-seg {
+    display: inline-flex;
+    padding: 3px;
+    gap: 2px;
+    background: var(--qa-surface-2);
+    border: 1px solid var(--qa-border);
+    border-radius: 999px;
+}
+
+.rm-seg[hidden] {
+    display: none;
+}
+
+.rm-seg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: .86rem;
+    line-height: 1;
+    color: var(--qa-text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease;
+}
+
+.rm-seg-btn:hover {
+    color: var(--qa-text);
+}
+
+.rm-seg-btn[aria-pressed="true"] {
+    color: var(--qa-text);
+    font-weight: 600;
+    background: var(--qa-surface);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+.rm-seg-btn:focus-visible {
+    outline: 2px solid var(--qa-accent);
+    outline-offset: 2px;
+}
+
+.rm-seg-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--rm-neutral-ink);
+}
+
+.rm-seg-btn[data-status="done"] .rm-seg-dot {
+    background: var(--rm-done-ink);
+}
+
+.rm-seg-btn[data-status="progress"] .rm-seg-dot {
+    background: var(--rm-prog-ink);
+}
+
+.rm-seg-num {
+    font-size: .78rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--qa-text-muted);
+}
+
+/* Search */
 
 .rm-filter {
     display: flex;
@@ -79,7 +267,7 @@
 
 .rm-filter input {
     padding: 9px 0;
-    min-width: 12rem;
+    min-width: 15rem;
     font: inherit;
     font-size: .88rem;
     color: var(--qa-text);
@@ -100,111 +288,114 @@
     padding-left: 4px;
     font-size: .76rem;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
     color: var(--qa-text-muted);
 }
 
-/* ---------- Done in PROD / In Progress sections ---------- */
+/* ---------- viewer shell ----------
+   The shared .qa-viewer card frames an iframe on the sibling pages. Here the
+   table brings its own card, so drop the outer frame and let the placeholder
+   states wear it instead. */
 
-.rm-groups {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.qa-viewer.rm-viewer {
+    min-height: 0;
+    background: transparent;
+    border: 0;
+    overflow: visible;
 }
 
-.rm-groups[hidden] {
-    display: none;
-}
-
-.rm-group[hidden] {
-    display: none;
-}
-
-.rm-group-head {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.rm-group-head h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--qa-text);
-}
-
-.rm-group-count {
-    font-size: .8rem;
-    font-weight: 600;
-    color: var(--qa-text-muted);
-}
-
-#rm-group-done .rm-group-head h3::before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-right: 8px;
-    border-radius: 50%;
-    background: var(--qa-success, #22a06b);
-}
-
-#rm-group-progress .rm-group-head h3::before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-right: 8px;
-    border-radius: 50%;
-    background: var(--qa-accent);
-}
-
-/* ---------- table ---------- */
-
-.rm-table-wrap {
-    max-height: 50vh;
-    overflow: auto;
+.rm-viewer .qa-state {
+    background: var(--qa-surface);
     border: 1px solid var(--qa-border);
     border-radius: var(--qa-radius);
 }
 
-.rm-table-wrap[hidden] {
+/* ---------- table ---------- */
+
+.rm-card {
+    background: var(--qa-surface);
+    border: 1px solid var(--qa-border);
+    border-radius: var(--qa-radius);
+    overflow: hidden;
+}
+
+.rm-card[hidden] {
     display: none;
+}
+
+.rm-table-wrap {
+    max-height: min(64vh, 780px);
+    overflow: auto;
 }
 
 .rm-table {
     width: 100%;
-    border-collapse: collapse;
-    font-size: .86rem;
-    font-variant-numeric: tabular-nums;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .87rem;
 }
 
-.rm-table th {
+.rm-table thead th {
     position: sticky;
     top: 0;
     z-index: 2;
-    padding: 11px 14px;
+    padding: 0;
     text-align: left;
-    white-space: nowrap;
-    font-size: .72rem;
+    background: var(--qa-surface-2);
+    border-bottom: 1px solid var(--qa-border);
+}
+
+.rm-sort {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 11px 14px;
+    font: inherit;
+    font-size: .71rem;
     font-weight: 700;
     letter-spacing: .05em;
     text-transform: uppercase;
+    white-space: nowrap;
+    text-align: left;
     color: var(--qa-text-muted);
-    background: var(--qa-surface-2);
-    border-bottom: 1px solid var(--qa-border);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+
+.rm-sort:hover {
+    color: var(--qa-text);
+}
+
+.rm-sort:focus-visible {
+    outline: 2px solid var(--qa-accent);
+    outline-offset: -2px;
+}
+
+.rm-sort i {
+    font-size: .72rem;
+    opacity: .35;
+}
+
+.rm-table th[aria-sort] .rm-sort {
+    color: var(--qa-text);
+}
+
+.rm-table th[aria-sort] .rm-sort i {
+    opacity: 1;
+    color: var(--qa-accent);
 }
 
 .rm-table td {
     padding: 10px 14px;
-    vertical-align: top;
+    vertical-align: middle;
     color: var(--qa-text);
     border-bottom: 1px solid var(--qa-border);
-    max-width: 34rem;
 }
 
-.rm-table tbody tr:nth-child(even) td {
-    background: var(--qa-surface-2);
+.rm-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
 .rm-table tbody tr:hover td {
@@ -215,12 +406,208 @@
     display: none;
 }
 
+/* Column sizing: every column hugs its content, the title soaks up the rest. */
+.rm-table th,
+.rm-table td {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.rm-table .rm-c-title {
+    width: auto;
+    min-width: 20rem;
+    white-space: normal;
+    line-height: 1.4;
+}
+
+/* Product area runs long ("Customer Data and Product Support"). Let it wrap so
+   one 33-character value does not set the column width — but pair max-width
+   with min-width, or the width:1% above collapses it to min-content and it
+   wraps a word per line. Wrap, never clip: no value is hidden from the reader.
+   Tracker keeps nowrap so its pill always reads as a single tag. */
+.rm-table .rm-c-type {
+    min-width: 10rem;
+    max-width: 11rem;
+    white-space: normal;
+}
+
+/* ---------- cell components ---------- */
+
+.rm-id {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .84rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--qa-text-muted);
+}
+
+/* Status pill and tracker badge share one shape. */
+.rm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    font-size: .74rem;
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: nowrap;
+    border-radius: 999px;
+    color: var(--rm-neutral-ink);
+    background: var(--rm-neutral-tint);
+}
+
+.rm-badge i {
+    font-size: .7rem;
+}
+
+.rm-badge[data-tone="done"] {
+    color: var(--rm-done-ink);
+    background: var(--rm-done-tint);
+}
+
+.rm-badge[data-tone="progress"] {
+    color: var(--rm-prog-ink);
+    background: var(--rm-prog-tint);
+}
+
+.rm-badge[data-tone="bug"] {
+    color: var(--rm-bug-ink);
+    background: var(--rm-bug-tint);
+}
+
+/* Environment pipeline: STAGE / CERT / PROD, lit where the sheet records a run. */
+.rm-pipe {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.rm-pipe-step {
+    padding: 3px 7px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    line-height: 1.3;
+    border-radius: 5px;
+    color: var(--qa-text-muted);
+    background: var(--qa-surface-2);
+    border: 1px dashed var(--qa-border);
+}
+
+.rm-pipe-step.is-on {
+    color: var(--qa-accent);
+    background: var(--qa-accent-soft);
+    border: 1px solid var(--qa-accent-soft);
+}
+
+.rm-pipe-extra {
+    margin-left: 4px;
+    font-size: .72rem;
+    color: var(--qa-text-muted);
+}
+
+/* Assignee */
+.rm-who {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rm-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    border-radius: 50%;
+    color: var(--rm-neutral-ink);
+    background: var(--rm-neutral-tint);
+}
+
+/* Test window: start -> end */
+.rm-window {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-variant-numeric: tabular-nums;
+}
+
+.rm-window i {
+    font-size: .66rem;
+    color: var(--qa-text-muted);
+}
+
+.rm-muted {
+    color: var(--qa-text-muted);
+}
+
+/* Secondary text, e.g. product area */
+.rm-soft {
+    font-size: .82rem;
+    color: var(--qa-text-muted);
+}
+
+/* No search hits */
+.rm-nohits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--qa-text-muted);
+}
+
+.rm-nohits[hidden] {
+    display: none;
+}
+
+.rm-nohits i {
+    font-size: 1.4rem;
+    color: var(--qa-text-muted);
+}
+
+.rm-foot {
+    padding: 9px 14px;
+    font-size: .76rem;
+    color: var(--qa-text-muted);
+    background: var(--qa-surface-2);
+    border-top: 1px solid var(--qa-border);
+}
+
+.rm-foot[hidden] {
+    display: none;
+}
+
 /* ---------- small screens ---------- */
 
+@media (max-width: 900px) {
+    .rm-table .rm-c-type {
+        display: none;
+    }
+}
+
 @media (max-width: 768px) {
-    .rm-subbar {
+    .rm-subtitle {
+        margin: -1rem 0 1.2rem;
+    }
+
+    .rm-controls,
+    .rm-controls-left {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .rm-seg {
+        justify-content: space-between;
+    }
+
+    .rm-seg-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 6px;
     }
 
     .rm-filter input {
@@ -229,17 +616,26 @@
     }
 
     .rm-table-wrap {
-        max-height: 62vh;
+        max-height: 68vh;
     }
 
     .rm-table th,
     .rm-table td {
         padding: 9px 10px;
     }
+
+    .rm-sort {
+        padding: 10px;
+    }
+
+    .rm-table .rm-c-title {
+        min-width: 14rem;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .rm-chip {
+    .rm-chip,
+    .rm-seg-btn {
         transition: none;
     }
 }
